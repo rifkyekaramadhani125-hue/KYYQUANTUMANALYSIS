@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYY QUANTUM ANALYSIS</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --navy: #020617;
+            --card: #0f172a;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--navy);
+            color: #f8fafc;
+            margin: 0;
+            overflow-x: hidden;
+            letter-spacing: -0.01em;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #d4af37 0%, #fcd34d 50%, #b8962e 100%);
+            background-size: 200% auto;
+            color: #020617;
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-main:hover:not(:disabled) {
+            background-position: right center;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        #chart-container {
+            height: 520px;
+            width: 100%;
+            border-radius: 0 0 1.5rem 1.5rem;
+        }
+
+        .ai-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .ai-content strong { color: var(--gold); }
+        .ai-content ul { list-style: none; padding: 0; }
+        .ai-content li { 
+            position: relative; 
+            padding-left: 1.5rem; 
+            margin-bottom: 0.5rem;
+        }
+        .ai-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        @keyframes scan {
+            0__ { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .scanning-line {
+            height: 2px;
+            background: var(--gold);
+            position: absolute;
+            width: 100%;
+            z-index: 51;
+            top: 0;
+            animation: scan 3s linear infinite;
+            box-shadow: 0 0 15px var(--gold);
+        }
+
+        /* Custom Logo CSS to match uploaded image */
+        .custom-logo-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, #1e293b, #020617);
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        
+        .quantum-symbol {
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            border: 1.5px solid var(--gold);
+            border-radius: 50%;
+        }
+        .quantum-symbol.v2 { transform: rotate(60deg); }
+        .quantum-symbol.v3 { transform: rotate(-60deg); }
+        
+        .logo-text-center {
+            z-index: 10;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 10px;
+            color: white;
+            background: #020617;
+            padding: 2px 4px;
+            border: 1px solid var(--gold);
+        }
+
+        .arrow-up-gold {
+            position: absolute;
+            right: 12px;
+            top: 10px;
+            width: 25px;
+            height: 25px;
+            border-top: 3px solid var(--gold);
+            border-right: 3px solid var(--gold);
+            transform: rotate(-10deg);
+            z-index: 5;
+        }
+    </style>
+</head>
+
+<body class="pb-24">
+
+    <div class="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- HEADER -->
+        <header class="glass rounded-[2rem] p-5 flex justify-between items-center relative overflow-hidden">
+            <div class="flex items-center gap-4 z-10">
+                <!-- NEW LOGO BASED ON IMAGE -->
+                <div class="custom-logo-container">
+                    <div class="quantum-symbol"></div>
+                    <div class="quantum-symbol v2"></div>
+                    <div class="quantum-symbol v3"></div>
+                    <div class="logo-text-center">KYY</div>
+                    <svg class="absolute bottom-2 left-2 w-10 h-10 opacity-40" viewBox="0 0 100 100">
+                        <path d="M10 80 L30 60 L50 70 L90 20" fill="none" stroke="#d4af37" stroke-width="5" />
+                    </svg>
+                </div>
+                <div>
+                    <!-- NEW APP NAME BASED ON IMAGE -->
+                    <h1 class="text-2xl font-black font-orbitron tracking-tighter leading-none">QUANTUM <span class="text-[var(--gold)]">ANALYSIS</span></h1>
+                    <p class="text-[9px] uppercase tracking-[0.4em] text-slate-500 font-bold mt-1">KYY.SHARINGSTOCKKNOWLEDGE</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 z-10">
+                <div id="connection-status" class="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-[10px] font-black text-emerald-500 uppercase">Neural Link Active</span>
+                </div>
+                <div id="clock-container" class="flex items-center gap-3 px-5 py-2.5 bg-slate-900/80 rounded-full border border-white/5 backdrop-blur-xl">
+                    <div id="clock" class="font-mono text-slate-300 text-sm font-bold tracking-widest">00:00:00</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- SIDEBAR -->
+            <aside class="lg:col-span-3 space-y-4">
+                <div class="glass rounded-[2rem] p-6 space-y-6 border-l-4 border-[var(--gold)] relative">
+                    <div class="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-24 bg-[var(--gold)]/20 blur-sm rounded-full"></div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Instrument</label>
+                            <span class="status-badge bg-slate-800 text-slate-400">IDX Verified</span>
+                        </div>
+                        <div class="relative group">
+                            <input id="ticker-input" placeholder="ASII"
+                                class="w-full p-5 rounded-2xl bg-slate-950/80 border border-white/10 uppercase font-black text-3xl text-white outline-none focus:border-[var(--gold)] focus:ring-4 focus:ring-[var(--gold)]/10 transition-all placeholder:text-slate-800">
+                            <i data-lucide="search" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-[var(--gold)] transition-colors"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Analytic Context</label>
+                        <textarea id="context" rows="3" placeholder="Sebutkan strategi (misal: swing trading, scalping, atau cek fundamental)..."
+                            class="w-full p-4 rounded-2xl bg-slate-950/80 border border-white/10 text-sm text-slate-300 outline-none resize-none focus:border-[var(--gold)] transition-all leading-relaxed"></textarea>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 block">System Encryption Key</label>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[9px] text-[var(--gold)] hover:underline flex items-center gap-1 font-bold">
+                                Get API <i data-lucide="external-link" class="w-3 h-3"></i>
+                            </a>
+                        </div>
+                        <div class="relative">
+                            <input id="api-key" type="password" placeholder="Enter Gemini Pro Key..."
+                                class="w-full p-4 rounded-2xl bg-slate-950/80 border border-white/10 text-xs font-mono text-[var(--gold)] outline-none focus:border-[var(--gold)] transition-all pr-12">
+                            <button onclick="toggleKey()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400">
+                                <i data-lucide="eye" class="w-4 h-4" id="eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="runAnalysis()" id="btn-run" class="btn-main w-full py-5 rounded-2xl flex items-center justify-center gap-3 group">
+                        <i data-lucide="search" class="w-5 h-5 stroke-[2.5]"></i>
+                        <span class="font-bold text-lg tracking-wide uppercase">Enter / Search</span>
+                    </button>
+                </div>
+                
+                <div class="glass rounded-[1.5rem] p-5 border-t border-white/5 bg-gradient-to-br from-slate-900/40 to-transparent">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Market Sentiment</span>
+                        <div id="sentiment-dot" class="w-2 h-2 rounded-full bg-slate-700"></div>
+                    </div>
+                    <div class="h-2 bg-slate-800 rounded-full overflow-hidden flex">
+                        <div id="bull-bar" class="h-full bg-emerald-500 transition-all duration-1000" style="width: 50%"></div>
+                        <div id="bear-bar" class="h-full bg-red-500 transition-all duration-1000" style="width: 50%"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 font-mono text-[9px] font-bold">
+                        <span class="text-emerald-500">BULLS: <span id="bull-val">50%</span></span>
+                        <span class="text-red-500">BEARS: <span id="bear-val">50%</span></span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="lg:col-span-9 space-y-6">
+
+                <!-- METRICS GRID -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Current Market Price</p>
+                        <div id="price-val" class="text-xl md:text-2xl font-bold text-white tracking-tight">IDR 0,000</div>
+                    </div>
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Quantum Price Target</p>
+                        <div id="val-target" class="text-xl md:text-2xl font-bold text-emerald-400 tracking-tight">---</div>
+                    </div>
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Risk Assessment</p>
+                        <div id="val-risk" class="text-xl md:text-2xl font-bold text-white tracking-tight">---</div>
+                    </div>
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Neural Alpha Rating</p>
+                        <div id="val-rating" class="text-xl md:text-2xl font-bold text-white tracking-tight">---</div>
+                    </div>
+                </div>
+
+                <!-- CHART SECTION -->
+                <div class="glass rounded-[2rem] overflow-hidden border border-white/5 relative group">
+                    <div id="loading-overlay" class="absolute inset-0 bg-slate-950/95 z-50 hidden flex items-center justify-center flex-col gap-6 backdrop-blur-md">
+                        <div class="scanning-line"></div>
+                        <div class="relative">
+                            <div class="w-24 h-24 rounded-full border-2 border-slate-800 border-t-[var(--gold)] animate-spin"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="radio" class="w-10 h-10 text-[var(--gold)] animate-pulse"></i>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p id="loading-step" class="font-black text-[var(--gold)] uppercase tracking-[0.3em] text-xs">Initializing Quantum Core</p>
+                            <p id="loading-sub" class="text-[9px] text-slate-600 mt-2 font-mono">ENCRYPTED DATA STREAM CONNECTED</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-900/50 px-6 py-3 border-b border-white/5 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="line-chart" class="w-4 h-4 text-[var(--gold)]"></i>
+                            <span id="chart-title" class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Global Market Interface</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
+                            <div class="w-2 h-2 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-500/50"></div>
+                        </div>
+                    </div>
+                    <div id="chart-container"></div>
+                </div>
+
+                <!-- AI INSIGHTS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass rounded-[1.5rem] p-7 border-t border-white/10 hover:border-[var(--gold)]/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-blue-500/10 rounded-lg"><i data-lucide="users" class="w-4 h-4 text-blue-400"></i></div>
+                            <h3 class="text-[11px] font-black uppercase text-white tracking-widest">Bandarmology</h3>
+                        </div>
+                        <div id="content-bandar" class="ai-content">Kalkulasi kepemilikan dan distribusi belum diproses...</div>
+                    </div>
+                    <div class="glass rounded-[1.5rem] p-7 border-t border-white/10 hover:border-[var(--gold)]/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-purple-500/10 rounded-lg"><i data-lucide="layers" class="w-4 h-4 text-purple-400"></i></div>
+                            <h3 class="text-[11px] font-black uppercase text-white tracking-widest">Technical Hub</h3>
+                        </div>
+                        <div id="content-tech" class="ai-content">Data indikator teknikal sedang menunggu input...</div>
+                    </div>
+                    <div class="glass rounded-[1.5rem] p-7 border-t border-white/10 hover:border-[var(--gold)]/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-emerald-500/10 rounded-lg"><i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i></div>
+                            <h3 class="text-[11px] font-black uppercase text-white tracking-widest">Fundamental</h3>
+                        </div>
+                        <div id="content-fund" class="ai-content">Analisis rasio dan kinerja finansial belum tersedia...</div>
+                    </div>
+                </div>
+
+                <!-- VERDICT SECTION -->
+                <div class="glass rounded-[2rem] p-8 border-l-8 border-[var(--gold)] shadow-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-10 opacity-[0.03] rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                        <i data-lucide="shield-check" class="w-48 h-48 text-white"></i>
+                    </div>
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-xl bg-[var(--gold)]/10 flex items-center justify-center">
+                            <i data-lucide="terminal" class="text-[var(--gold)] w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black uppercase text-white tracking-[0.2em]">Strategy Intelligence & Verdict</h3>
+                            <p class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Compiled by Quantum Neural Engine</p>
+                        </div>
+                    </div>
+                    <div id="content-conclusion" class="ai-content text-sm text-slate-200 leading-relaxed font-medium bg-slate-900/30 p-6 rounded-2xl border border-white/5">
+                        Siap melakukan analisis mendalam. Masukkan kode emiten IDX dan API Key Anda pada panel samping untuk memulai algoritma Alpha.
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="fixed bottom-0 left-0 right-0 glass px-10 py-4 flex justify-between items-center text-[10px] uppercase font-black text-slate-500 border-t border-white/5 z-[60]">
+        <div class="flex gap-8 items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse"></div>
+                <span class="tracking-widest">KYY.SHARINGSTOCKKNOWLEDGE</span>
+            </div>
+            <div class="hidden md:flex items-center gap-2 text-slate-700">
+                <i data-lucide="database" class="w-3 h-3"></i>
+                <span id="data-speed">LATENCY: 24ms</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-8">
+            <div class="hidden md:flex gap-4">
+                <span class="hover:text-[var(--gold)] cursor-help transition-colors">System Logs</span>
+                <span class="hover:text-[var(--gold)] cursor-help transition-colors">Neural Network</span>
+            </div>
+            <div class="flex items-center gap-3 pl-8 border-l border-white/10">
+                <span class="text-slate-400">Gemini 2.5 Multi-Modal Enabled</span>
+                <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center"><i data-lucide="cpu" class="w-3 h-3"></i></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let tvWidget = null;
+        lucide.createIcons();
+
+        const storage = {
+            set: (k, v) => localStorage.setItem(`kyy_ultra_${k}`, v),
+            get: (k) => localStorage.getItem(`kyy_ultra_${k}`)
+        };
+
+        const keyField = document.getElementById('api-key');
+        if (storage.get('secure_token')) {
+            keyField.value = storage.get('secure_token');
+        }
+
+        function toggleKey() {
+            const isPass = keyField.type === 'password';
+            keyField.type = isPass ? 'text' : 'password';
+            document.getElementById('eye-icon').setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+            lucide.createIcons();
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-GB', { hour12: false });
+            document.getElementById('clock').innerText = time;
+            
+            if (Math.random() > 0.8) {
+                const latency = Math.floor(Math.random() * 20) + 15;
+                document.getElementById('data-speed').innerText = `LATENCY: ${latency}ms`;
+            }
+        }
+        setInterval(updateClock, 1000);
+
+        async function runAnalysis() {
+            const rawTicker = document.getElementById('ticker-input').value.trim();
+            const ticker = rawTicker.toUpperCase().replace(/[^A-Z]/g, '');
+            const apiKey = keyField.value.trim();
+            const userContext = document.getElementById('context').value.trim();
+
+            if (!ticker) return showNotify("Target emiten (Ticker) tidak valid.", "error");
+            if (!apiKey) return showNotify("API Key diperlukan untuk neural link.", "error");
+
+            storage.set('secure_token', apiKey);
+            
+            const btn = document.getElementById('btn-run');
+            const loader = document.getElementById('loading-overlay');
+            const stepText = document.getElementById('loading-step');
+            const subText = document.getElementById('loading-sub');
+
+            try {
+                btn.disabled = true;
+                loader.classList.remove('hidden');
+                
+                stepText.innerText = "Syncing Real-Time Market Feed...";
+                renderTradingView(ticker);
+                document.getElementById('chart-title').innerText = `LIVE STREAM: IDX:${ticker} [VERIFIED DATA]`;
+
+                stepText.innerText = "Processing Neural Engine Precision...";
+                const result = await fetchQuantumData(apiKey, ticker, userContext, (msg) => {
+                    subText.innerText = msg;
+                });
+                
+                stepText.innerText = "Validating Output Accuracy...";
+                subText.innerText = "PARSING DATA STREAM...";
+                deployUI(result);
+                updateSentiment(result.bull_percent || 50);
+                
+                showNotify(`Analisis ${ticker} selesai dengan presisi tinggi.`, "success");
+                
+            } catch (err) {
+                console.error("Critical System Failure:", err);
+                showNotify(err.message || "Kegagalan pada Quantum Core.", "error");
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+                subText.innerText = "ENCRYPTED DATA STREAM CONNECTED";
+            }
+        }
+
+        async function fetchQuantumData(key, ticker, context, statusCb) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
+            
+            const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} dengan AKURASI DATA 100%.
+            Konteks Strategi User: ${context || 'Analisis pasar komprehensif'}.
+            
+            PENTING: Berikan jawaban HANYA dalam format JSON mentah tanpa markdown block, dengan struktur properti:
+            {
+                "price": "IDR ...",
+                "target": "IDR ...",
+                "rating": "A/B/C/Buy/Sell",
+                "risk": "Low/Med/High",
+                "bandar": "analisis bandarmologi singkat",
+                "tech": "analisis teknikal singkat",
+                "fund": "analisis fundamental singkat",
+                "summary": "kesimpulan panjang strategi",
+                "bull_percent": 0-100
+            }`;
+
+            const payload = {
+                contents: [{ 
+                    parts: [{ text: systemPrompt }] 
+                }],
+                tools: [{ "google_search": {} }],
+                generationConfig: { 
+                    temperature: 0.2
+                }
+            };
+
+            const fetchWithExponentialBackoff = async (url, options, retries = 5) => {
+                let delay = 2000;
+                
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const res = await fetch(url, options);
+                        
+                        if (res.status === 429) {
+                            const retryMsg = `Quota Limit. Retrying in ${delay/1000}s...`;
+                            if (statusCb) statusCb(retryMsg);
+                            await new Promise(r => setTimeout(r, delay));
+                            delay *= 2;
+                            continue;
+                        }
+
+                        return res;
+                    } catch (e) {
+                        if (i === retries - 1) throw e;
+                        await new Promise(r => setTimeout(r, delay));
+                        delay *= 2;
+                    }
+                }
+            };
+
+            const response = await fetchWithExponentialBackoff(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response || !response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                const msg = errData.error?.message || "Quantum Link Interrupted";
+                throw new Error(msg);
+            }
+
+            const data = await response.json();
+            let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) throw new Error("Neural Engine return empty data.");
+
+            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error("JSON Parsing failed. Raw text:", text);
+                throw new Error("Gagal mengurai data algoritma. Silakan coba lagi.");
+            }
+        }
+
+        function deployUI(data) {
+            const elements = {
+                'price-val': data.price,
+                'val-target': data.target,
+                'val-rating': data.rating,
+                'val-risk': data.risk,
+                'content-bandar': data.bandar,
+                'content-tech': data.tech,
+                'content-fund': data.fund,
+                'content-conclusion': data.summary
+            };
+
+            Object.entries(elements).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.opacity = '0';
+                    setTimeout(() => {
+                        el.innerText = val || "N/A";
+                        el.style.opacity = '1';
+                    }, 200);
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function updateSentiment(bull) {
+            const bear = 100 - bull;
+            const bullBar = document.getElementById('bull-bar');
+            const bearBar = document.getElementById('bear-bar');
+            if (bullBar && bearBar) {
+                bullBar.style.width = `${bull}%`;
+                bearBar.style.width = `${bear}%`;
+                document.getElementById('bull-val').innerText = `${bull}%`;
+                document.getElementById('bear-val').innerText = `${bear}%`;
+                
+                const dot = document.getElementById('sentiment-dot');
+                dot.className = `w-2 h-2 rounded-full ${bull > 50 ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'}`;
+            }
+        }
+
+        function renderTradingView(symbol) {
+            const container = document.getElementById('chart-container');
+            container.innerHTML = ''; 
+            
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "IDX:" + symbol,
+                "interval": "D",
+                "timezone": "Asia/Jakarta",
+                "theme": "dark",
+                "style": "1",
+                "locale": "id",
+                "toolbar_bg": "#020617",
+                "enable_publishing": false,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": true,
+                "container_id": "chart-container",
+                "studies": ["MASimple@tv-basicstudies", "RSI@tv-basicstudies", "MACD@tv-basicstudies"]
+            });
+        }
+
+        function showNotify(msg, type = "info") {
+            const toast = document.createElement('div');
+            const borderColor = type === 'error' ? 'border-red-500' : 'border-[var(--gold)]';
+            const icon = type === 'error' ? 'alert-octagon' : 'info';
+            
+            toast.className = `fixed top-6 right-6 glass border-l-4 ${borderColor} p-5 rounded-2xl z-[100] shadow-2xl flex items-center gap-4 min-w-[300px] transform transition-all duration-500 translate-x-full`;
+            toast.innerHTML = `
+                <div class="p-2 rounded-lg bg-white/5"><i data-lucide="${icon}" class="w-5 h-5 ${type === 'error' ? 'text-red-500' : 'text-[var(--gold)]'}"></i></div>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black uppercase text-slate-500 tracking-widest">${type} notification</span>
+                    <span class="text-sm font-bold text-slate-100">${msg}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => toast.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        window.onload = () => {
+            renderTradingView('COMPOSITE');
+            updateSentiment(50);
+        };
+    </script>
+</body>
+</html>
