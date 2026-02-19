@@ -86,7 +86,7 @@
         }
 
         @keyframes scan {
-            0__ { top: 0%; opacity: 0; }
+            0% { top: 0%; opacity: 0; }
             50% { opacity: 1; }
             100% { top: 100%; opacity: 0; }
         }
@@ -369,7 +369,7 @@
                 <span class="hover:text-[var(--gold)] cursor-help transition-colors">Neural Network</span>
             </div>
             <div class="flex items-center gap-3 pl-8 border-l border-white/10">
-                <span class="text-slate-400">Gemini 2.5 Multi-Modal Enabled</span>
+                <span id="ai-model-label" class="text-slate-400">Gemini Stable Engine: Standby</span>
                 <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center"><i data-lucide="cpu" class="w-3 h-3"></i></div>
             </div>
         </div>
@@ -378,6 +378,14 @@
     <script>
         let tvWidget = null;
         lucide.createIcons();
+
+        const STABLE_MODELS = [
+            'gemini-2.0-flash',
+            'gemini-2.0-flash-lite',
+            'gemini-1.5-flash',
+            'gemini-1.5-pro'
+        ];
+        let activeModel = 'N/A';
 
         const storage = {
             set: (k, v) => localStorage.setItem(`kyy_ultra_${k}`, v),
@@ -446,7 +454,11 @@
                 
             } catch (err) {
                 console.error("Critical System Failure:", err);
-                showNotify(err.message || "Kegagalan pada Quantum Core.", "error");
+                const rawMsg = err.message || "Kegagalan pada Quantum Core.";
+                const stalePreviewHint = /gemini-2\.5-flash-preview-09-2025/i.test(rawMsg)
+                    ? `${rawMsg} | Hint: hard refresh (Ctrl+Shift+R) dan deploy ulang branch Pages.`
+                    : rawMsg;
+                showNotify(stalePreviewHint, "error");
             } finally {
                 btn.disabled = false;
                 loader.classList.add('hidden');
@@ -455,11 +467,11 @@
         }
 
         async function fetchQuantumData(key, ticker, context, statusCb) {
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
-            
+            const stableModelPriority = STABLE_MODELS;
+
             const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} dengan AKURASI DATA 100%.
             Konteks Strategi User: ${context || 'Analisis pasar komprehensif'}.
-            
+
             PENTING: Berikan jawaban HANYA dalam format JSON mentah tanpa markdown block, dengan struktur properti:
             {
                 "price": "IDR ...",
@@ -474,24 +486,28 @@
             }`;
 
             const payload = {
-                contents: [{ 
-                    parts: [{ text: systemPrompt }] 
+                contents: [{
+                    parts: [{ text: systemPrompt }]
                 }],
-                tools: [{ "google_search": {} }],
-                generationConfig: { 
-                    temperature: 0.2
+                generationConfig: {
+                    temperature: 0.2,
+                    maxOutputTokens: 1024,
+                    responseMimeType: 'application/json'
                 }
             };
 
-            const fetchWithExponentialBackoff = async (url, options, retries = 5) => {
-                let delay = 2000;
-                
+            const fetchWithExponentialBackoff = async (url, options, retries = 4, timeoutMs = 16000) => {
+                let delay = 1200;
+
                 for (let i = 0; i < retries; i++) {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
                     try {
-                        const res = await fetch(url, options);
-                        
-                        if (res.status === 429) {
-                            const retryMsg = `Quota Limit. Retrying in ${delay/1000}s...`;
+                        const res = await fetch(url, { ...options, signal: controller.signal });
+
+                        if (res.status === 429 || res.status >= 500) {
+                            const retryMsg = `Server sibuk (${res.status}). Retry ${i + 1}/${retries} dalam ${Math.round(delay / 1000)}s...`;
                             if (statusCb) statusCb(retryMsg);
                             await new Promise(r => setTimeout(r, delay));
                             delay *= 2;
@@ -500,37 +516,98 @@
 
                         return res;
                     } catch (e) {
-                        if (i === retries - 1) throw e;
+                        const isAbort = e?.name === 'AbortError';
+                        const networkMsg = isAbort ? 'Request timeout pada jaringan.' : 'Gangguan koneksi jaringan.';
+
+                        if (i === retries - 1) {
+                            throw new Error(`${networkMsg} Cek internet / API key restriction, lalu coba lagi.`);
+                        }
+
+                        if (statusCb) statusCb(`${networkMsg} Retry ${i + 1}/${retries}...`);
                         await new Promise(r => setTimeout(r, delay));
                         delay *= 2;
+                    } finally {
+                        clearTimeout(timeoutId);
                     }
+                }
+
+                throw new Error('Request timeout setelah beberapa percobaan.');
+            };
+
+            const buildModelEndpoint = (model) =>
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+
+            const parseJsonFromModel = (rawText) => {
+                const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+                try {
+                    return JSON.parse(cleaned);
+                } catch (_) {
+                    const firstObjStart = cleaned.indexOf('{');
+                    const lastObjEnd = cleaned.lastIndexOf('}');
+                    if (firstObjStart !== -1 && lastObjEnd !== -1 && lastObjEnd > firstObjStart) {
+                        const maybeJson = cleaned.slice(firstObjStart, lastObjEnd + 1);
+                        return JSON.parse(maybeJson);
+                    }
+                    throw new Error('Gagal mengurai data algoritma. Silakan coba lagi.');
                 }
             };
 
-            const response = await fetchWithExponentialBackoff(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const candidateModels = stableModelPriority;
+            let lastErrorMessage = 'Quantum Link Interrupted';
 
-            if (!response || !response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                const msg = errData.error?.message || "Quantum Link Interrupted";
-                throw new Error(msg);
+            for (const model of candidateModels) {
+                const endpoint = buildModelEndpoint(model);
+                if (statusCb) statusCb(`Menyambungkan model AI: ${model}...`);
+
+                const response = await fetchWithExponentialBackoff(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response) {
+                    continue;
+                }
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    const serverMessage = errData.error?.message || '';
+                    lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
+
+                    const modelUnavailable = response.status === 404 || /no longer available|not found/i.test(serverMessage);
+                    const authOrRestriction = response.status === 400 || response.status === 401 || response.status === 403;
+                    if (modelUnavailable && model !== candidateModels[candidateModels.length - 1]) {
+                        if (statusCb) statusCb(`Model ${model} tidak tersedia, mencoba model stabil berikutnya...`);
+                        continue;
+                    }
+
+                    if (authOrRestriction) {
+                        throw new Error(`API Key ditolak / dibatasi (${response.status}). Aktifkan Gemini API dan izinkan HTTP referrer domain app Anda.`);
+                    }
+
+                    throw new Error(lastErrorMessage);
+                }
+
+                const data = await response.json();
+                activeModel = model;
+                const modelLabel = document.getElementById('ai-model-label');
+                if (modelLabel) modelLabel.innerText = `Gemini Active: ${model}`;
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) {
+                    lastErrorMessage = 'Neural Engine return empty data.';
+                    continue;
+                }
+
+                try {
+                    return parseJsonFromModel(text);
+                } catch (e) {
+                    lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
+                    console.error('JSON Parsing failed. Raw text:', text);
+                }
             }
 
-            const data = await response.json();
-            let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!text) throw new Error("Neural Engine return empty data.");
-
-            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error("JSON Parsing failed. Raw text:", text);
-                throw new Error("Gagal mengurai data algoritma. Silakan coba lagi.");
-            }
+            throw new Error(lastErrorMessage);
         }
 
         function deployUI(data) {
@@ -618,6 +695,8 @@
         }
 
         window.onload = () => {
+            const modelLabel = document.getElementById('ai-model-label');
+            if (modelLabel) modelLabel.innerText = `Gemini Stable Ready: ${STABLE_MODELS.join(' / ')}`;
             renderTradingView('COMPOSITE');
             updateSentiment(50);
         };
