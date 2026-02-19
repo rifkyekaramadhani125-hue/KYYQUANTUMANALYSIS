@@ -462,11 +462,22 @@
         }
 
         async function fetchQuantumData(key, ticker, context, statusCb) {
+ codex/build-apk-with-old-ui-design-7ar8uj
+            // Prioritas model Gemini stabil (tanpa preview/exp)
+            const models = [
+                "gemini-2.0-flash",
+                "gemini-2.0-flash-lite",
+                "gemini-1.5-flash",
+                "gemini-1.5-pro"
+            ];
+            const apiVersions = ["v1beta", "v1"];
+
             // Identifier model yang valid untuk lingkungan preview saat ini
             const models = [
                 "gemini-2.0-flash-exp",
                 "gemini-1.5-flash"
             ];
+ main
 
             const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} secara mendalam.
             Konteks Strategi User: ${context || 'Analisis pasar komprehensif'}.
@@ -494,9 +505,30 @@
                 }
             };
 
+ codex/build-apk-with-old-ui-design-7ar8uj
+            const parseJsonFromModel = (rawText) => {
+                const text = (rawText || '').trim();
+                if (!text) throw new Error('Zero-Length Signal Received');
+
+                try {
+                    return JSON.parse(text);
+                } catch (_) {
+                    const cleaned = text
+                        .replace(/^```json\s*/i, '')
+                        .replace(/^```\s*/i, '')
+                        .replace(/```$/i, '')
+                        .trim();
+                    return JSON.parse(cleaned);
+                }
+            };
+
+            const executeRequest = async (apiVersion, modelName) => {
+                const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${modelName}:generateContent?key=${key}`;
+
             const executeRequest = async (modelName) => {
                 // Gunakan format endpoint v1beta:generateContent sesuai spesifikasi
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`;
+ main
                 
                 let lastFetchError = null;
                 for (let attempt = 0; attempt < 5; attempt++) {
@@ -529,6 +561,7 @@
                              
                              const errData = await backupRes.json().catch(() => ({}));
                              throw new Error(errData.error?.message || `Error ${backupRes.status}`);
+ codex/build-apk-with-old-ui-design-7ar8uj
                         }
 
                         if (!res.ok) {
@@ -536,6 +569,15 @@
                             throw new Error(errData.error?.message || `Error ${res.status}`);
                         }
 
+
+                        }
+
+                        if (!res.ok) {
+                            const errData = await res.json().catch(() => ({}));
+                            throw new Error(errData.error?.message || `Error ${res.status}`);
+                        }
+
+ main
                         return await res.json();
                     } catch (e) {
                         lastFetchError = e;
@@ -549,6 +591,20 @@
 
             let finalError = null;
             for (const model of models) {
+ codex/build-apk-with-old-ui-design-7ar8uj
+                for (const apiVersion of apiVersions) {
+                    try {
+                        if (statusCb) statusCb(`Connecting to ${model} (${apiVersion})...`);
+                        const responseData = await executeRequest(apiVersion, model);
+                        const textContent = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+                        return parseJsonFromModel(textContent);
+                    } catch (e) {
+                        console.error(`Node ${model}@${apiVersion} Failure:`, e.message);
+                        finalError = e;
+                        if (e.message === "Model Not Found") continue;
+                        continue;
+                    }
+
                 try {
                     if (statusCb) statusCb(`Connecting to ${model}...`);
                     const responseData = await executeRequest(model);
@@ -563,6 +619,7 @@
                     if (e.message === "Model Not Found") continue; 
                     // Jika error lain, tetap coba fallback model berikutnya
                     continue;
+ main
                 }
             }
             
