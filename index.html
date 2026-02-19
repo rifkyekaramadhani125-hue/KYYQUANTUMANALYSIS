@@ -86,7 +86,7 @@
         }
 
         @keyframes scan {
-            0__ { top: 0%; opacity: 0; }
+            0% { top: 0%; opacity: 0; }
             50% { opacity: 1; }
             100% { top: 100%; opacity: 0; }
         }
@@ -455,11 +455,14 @@
         }
 
         async function fetchQuantumData(key, ticker, context, statusCb) {
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
-            
+            const preferredModels = [
+                'gemini-2.5-flash',
+                'gemini-2.0-flash'
+            ];
+
             const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} dengan AKURASI DATA 100%.
             Konteks Strategi User: ${context || 'Analisis pasar komprehensif'}.
-            
+
             PENTING: Berikan jawaban HANYA dalam format JSON mentah tanpa markdown block, dengan struktur properti:
             {
                 "price": "IDR ...",
@@ -474,24 +477,24 @@
             }`;
 
             const payload = {
-                contents: [{ 
-                    parts: [{ text: systemPrompt }] 
+                contents: [{
+                    parts: [{ text: systemPrompt }]
                 }],
-                tools: [{ "google_search": {} }],
-                generationConfig: { 
-                    temperature: 0.2
+                generationConfig: {
+                    temperature: 0.2,
+                    responseMimeType: 'application/json'
                 }
             };
 
             const fetchWithExponentialBackoff = async (url, options, retries = 5) => {
                 let delay = 2000;
-                
+
                 for (let i = 0; i < retries; i++) {
                     try {
                         const res = await fetch(url, options);
-                        
+
                         if (res.status === 429) {
-                            const retryMsg = `Quota Limit. Retrying in ${delay/1000}s...`;
+                            const retryMsg = `Quota Limit. Retrying in ${delay / 1000}s...`;
                             if (statusCb) statusCb(retryMsg);
                             await new Promise(r => setTimeout(r, delay));
                             delay *= 2;
@@ -505,32 +508,74 @@
                         delay *= 2;
                     }
                 }
+
+                throw new Error('Request timeout setelah beberapa percobaan.');
             };
 
-            const response = await fetchWithExponentialBackoff(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const buildModelEndpoint = (model) =>
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
 
-            if (!response || !response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                const msg = errData.error?.message || "Quantum Link Interrupted";
-                throw new Error(msg);
+            const parseJsonFromModel = (rawText) => {
+                const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+                try {
+                    return JSON.parse(cleaned);
+                } catch (_) {
+                    const firstObjStart = cleaned.indexOf('{');
+                    const lastObjEnd = cleaned.lastIndexOf('}');
+                    if (firstObjStart !== -1 && lastObjEnd !== -1 && lastObjEnd > firstObjStart) {
+                        const maybeJson = cleaned.slice(firstObjStart, lastObjEnd + 1);
+                        return JSON.parse(maybeJson);
+                    }
+                    throw new Error('Gagal mengurai data algoritma. Silakan coba lagi.');
+                }
+            };
+
+            let lastErrorMessage = 'Quantum Link Interrupted';
+
+            for (const model of preferredModels) {
+                const endpoint = buildModelEndpoint(model);
+                if (statusCb) statusCb(`Menyambungkan model AI: ${model}...`);
+
+                const response = await fetchWithExponentialBackoff(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response) {
+                    continue;
+                }
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    const serverMessage = errData.error?.message || '';
+                    lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
+
+                    const modelUnavailable = response.status === 404 || /no longer available|not found/i.test(serverMessage);
+                    if (modelUnavailable && model !== preferredModels[preferredModels.length - 1]) {
+                        if (statusCb) statusCb(`Model ${model} tidak tersedia, mencoba model cadangan...`);
+                        continue;
+                    }
+                    throw new Error(lastErrorMessage);
+                }
+
+                const data = await response.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) {
+                    lastErrorMessage = 'Neural Engine return empty data.';
+                    continue;
+                }
+
+                try {
+                    return parseJsonFromModel(text);
+                } catch (e) {
+                    lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
+                    console.error('JSON Parsing failed. Raw text:', text);
+                }
             }
 
-            const data = await response.json();
-            let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!text) throw new Error("Neural Engine return empty data.");
-
-            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error("JSON Parsing failed. Raw text:", text);
-                throw new Error("Gagal mengurai data algoritma. Silakan coba lagi.");
-            }
+            throw new Error(lastErrorMessage);
         }
 
         function deployUI(data) {
