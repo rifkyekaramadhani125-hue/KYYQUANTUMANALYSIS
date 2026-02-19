@@ -369,7 +369,7 @@
                 <span class="hover:text-[var(--gold)] cursor-help transition-colors">Neural Network</span>
             </div>
             <div class="flex items-center gap-3 pl-8 border-l border-white/10">
-                <span class="text-slate-400">Gemini 2.5 Multi-Modal Enabled</span>
+                <span id="ai-model-label" class="text-slate-400">Gemini Stable Engine: Standby</span>
                 <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center"><i data-lucide="cpu" class="w-3 h-3"></i></div>
             </div>
         </div>
@@ -378,6 +378,12 @@
     <script>
         let tvWidget = null;
         lucide.createIcons();
+
+        const STABLE_MODELS = [
+            'gemini-1.5-flash',
+            'gemini-1.5-pro'
+        ];
+        let activeModel = 'N/A';
 
         const storage = {
             set: (k, v) => localStorage.setItem(`kyy_ultra_${k}`, v),
@@ -455,10 +461,7 @@
         }
 
         async function fetchQuantumData(key, ticker, context, statusCb) {
-            const stableModelPriority = [
-                'gemini-1.5-flash',
-                'gemini-1.5-pro'
-            ];
+            const stableModelPriority = STABLE_MODELS;
 
             const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} dengan AKURASI DATA 100%.
             Konteks Strategi User: ${context || 'Analisis pasar komprehensif'}.
@@ -562,6 +565,9 @@
                 }
 
                 const data = await response.json();
+                activeModel = model;
+                const modelLabel = document.getElementById('ai-model-label');
+                if (modelLabel) modelLabel.innerText = `Gemini Active: ${model}`;
                 const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (!text) {
                     lastErrorMessage = 'Neural Engine return empty data.';
@@ -664,6 +670,8 @@
         }
 
         window.onload = () => {
+            const modelLabel = document.getElementById('ai-model-label');
+            if (modelLabel) modelLabel.innerText = `Gemini Stable Ready: ${STABLE_MODELS.join(' / ' )}`;
             renderTradingView('COMPOSITE');
             updateSentiment(50);
         };
