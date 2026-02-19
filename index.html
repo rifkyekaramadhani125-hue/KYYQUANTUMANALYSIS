@@ -380,9 +380,12 @@
         lucide.createIcons();
 
         const STABLE_MODELS = [
+            'gemini-2.0-flash',
+            'gemini-2.0-flash-lite',
             'gemini-1.5-flash',
             'gemini-1.5-pro'
         ];
+        const API_VERSIONS = ['v1beta', 'v1'];
         let activeModel = 'N/A';
 
         const storage = {
@@ -489,8 +492,8 @@
                 }
             };
 
-            const fetchWithExponentialBackoff = async (url, options, retries = 5) => {
-                let delay = 2000;
+            const fetchWithExponentialBackoff = async (url, options, retries = 4) => {
+                let delay = 1500;
 
                 for (let i = 0; i < retries; i++) {
                     try {
@@ -515,8 +518,8 @@
                 throw new Error('Request timeout setelah beberapa percobaan.');
             };
 
-            const buildModelEndpoint = (model) =>
-                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+            const buildModelEndpoint = (apiVersion, model) =>
+                `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${key}`;
 
             const parseJsonFromModel = (rawText) => {
                 const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -536,53 +539,65 @@
 
             const candidateModels = stableModelPriority;
             let lastErrorMessage = 'Quantum Link Interrupted';
+            const attempts = [];
 
             for (const model of candidateModels) {
-                const endpoint = buildModelEndpoint(model);
-                if (statusCb) statusCb(`Menyambungkan model AI: ${model}...`);
+                for (const apiVersion of API_VERSIONS) {
+                    const endpoint = buildModelEndpoint(apiVersion, model);
+                    if (statusCb) statusCb(`Menyambungkan AI: ${model} (${apiVersion})...`);
 
-                const response = await fetchWithExponentialBackoff(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                    const response = await fetchWithExponentialBackoff(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        },
+                        body: JSON.stringify(payload)
+                    });
 
-                if (!response) {
-                    continue;
-                }
-
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    const serverMessage = errData.error?.message || '';
-                    lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
-
-                    const modelUnavailable = response.status === 404 || /no longer available|not found/i.test(serverMessage);
-                    if (modelUnavailable && model !== candidateModels[candidateModels.length - 1]) {
-                        if (statusCb) statusCb(`Model ${model} tidak tersedia, mencoba model stabil berikutnya...`);
+                    if (!response) {
+                        attempts.push(`${model}@${apiVersion}: empty-response`);
                         continue;
                     }
-                    throw new Error(lastErrorMessage);
-                }
 
-                const data = await response.json();
-                activeModel = model;
-                const modelLabel = document.getElementById('ai-model-label');
-                if (modelLabel) modelLabel.innerText = `Gemini Active: ${model}`;
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) {
-                    lastErrorMessage = 'Neural Engine return empty data.';
-                    continue;
-                }
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        const serverMessage = errData.error?.message || '';
+                        lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
+                        attempts.push(`${model}@${apiVersion}: ${response.status}`);
 
-                try {
-                    return parseJsonFromModel(text);
-                } catch (e) {
-                    lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
-                    console.error('JSON Parsing failed. Raw text:', text);
+                        const modelUnavailable = response.status === 404 || /no longer available|not found|unsupported/i.test(serverMessage);
+                        if (modelUnavailable) {
+                            if (statusCb) statusCb(`Model/API ${model} (${apiVersion}) tidak tersedia, lanjut fallback...`);
+                            continue;
+                        }
+
+                        throw new Error(lastErrorMessage);
+                    }
+
+                    const data = await response.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!text) {
+                        attempts.push(`${model}@${apiVersion}: empty-candidate`);
+                        lastErrorMessage = 'Neural Engine return empty data.';
+                        continue;
+                    }
+
+                    try {
+                        const parsed = parseJsonFromModel(text);
+                        activeModel = `${model} (${apiVersion})`;
+                        const modelLabel = document.getElementById('ai-model-label');
+                        if (modelLabel) modelLabel.innerText = `Gemini Active: ${activeModel}`;
+                        return parsed;
+                    } catch (e) {
+                        attempts.push(`${model}@${apiVersion}: parse-error`);
+                        lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
+                        console.error('JSON Parsing failed. Raw text:', text);
+                    }
                 }
             }
 
-            throw new Error(lastErrorMessage);
+            throw new Error(`${lastErrorMessage}. Attempted: ${attempts.join(', ')}`);
         }
 
         function deployUI(data) {
