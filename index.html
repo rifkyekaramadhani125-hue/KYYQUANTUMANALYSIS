@@ -102,7 +102,6 @@
             box-shadow: 0 0 15px var(--gold);
         }
 
-        /* Custom Logo CSS to match uploaded image */
         .custom-logo-container {
             position: relative;
             width: 60px;
@@ -137,18 +136,6 @@
             padding: 2px 4px;
             border: 1px solid var(--gold);
         }
-
-        .arrow-up-gold {
-            position: absolute;
-            right: 12px;
-            top: 10px;
-            width: 25px;
-            height: 25px;
-            border-top: 3px solid var(--gold);
-            border-right: 3px solid var(--gold);
-            transform: rotate(-10deg);
-            z-index: 5;
-        }
     </style>
 </head>
 
@@ -159,7 +146,6 @@
         <!-- HEADER -->
         <header class="glass rounded-[2rem] p-5 flex justify-between items-center relative overflow-hidden">
             <div class="flex items-center gap-4 z-10">
-                <!-- NEW LOGO BASED ON IMAGE -->
                 <div class="custom-logo-container">
                     <div class="quantum-symbol"></div>
                     <div class="quantum-symbol v2"></div>
@@ -170,13 +156,16 @@
                     </svg>
                 </div>
                 <div>
-                    <!-- NEW APP NAME BASED ON IMAGE -->
                     <h1 class="text-2xl font-black font-orbitron tracking-tighter leading-none">QUANTUM <span class="text-[var(--gold)]">ANALYSIS</span></h1>
                     <p class="text-[9px] uppercase tracking-[0.4em] text-slate-500 font-bold mt-1">KYY.SHARINGSTOCKKNOWLEDGE</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-4 z-10">
+                <div id="auto-update-indicator" class="hidden md:flex items-center gap-2 px-4 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/20">
+                    <div class="w-2 h-2 rounded-full bg-yellow-500 animate-ping"></div>
+                    <span class="text-[10px] font-black text-yellow-500 uppercase">Live Auto-Syncing</span>
+                </div>
                 <div id="connection-status" class="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/20">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                     <span class="text-[10px] font-black text-emerald-500 uppercase">Neural Link Active</span>
@@ -369,11 +358,7 @@
                 <span class="hover:text-[var(--gold)] cursor-help transition-colors">Neural Network</span>
             </div>
             <div class="flex items-center gap-3 pl-8 border-l border-white/10">
-codex/fix-issues-based-on-attached-screenshot-44hw6l
-                <span id="ai-model-label" class="text-slate-400">Hybrid Analysis Engine: Standby</span>
-
-                <span id="ai-model-label" class="text-slate-400">Gemini Stable Engine: Standby</span>
- main
+                <span class="text-slate-400">Gemini 2.5 Multi-Modal Enabled</span>
                 <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center"><i data-lucide="cpu" class="w-3 h-3"></i></div>
             </div>
         </div>
@@ -381,22 +366,8 @@ codex/fix-issues-based-on-attached-screenshot-44hw6l
 
     <script>
         let tvWidget = null;
+        let autoUpdateInterval = null;
         lucide.createIcons();
-
-        const STABLE_MODELS = [
-            'gemini-2.0-flash',
-            'gemini-2.0-flash-lite',
-            'gemini-1.5-flash',
-            'gemini-1.5-pro'
-        ];
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-
-codex/fix-issues-based-on-attached-screenshot-iwv1qu
-
-        const API_VERSIONS = ['v1beta', 'v1'];
- main
- main
-        let activeModel = 'N/A';
 
         const storage = {
             set: (k, v) => localStorage.setItem(`kyy_ultra_${k}`, v),
@@ -417,64 +388,27 @@ codex/fix-issues-based-on-attached-screenshot-iwv1qu
 
         function updateClock() {
             const now = new Date();
-            const time = now.toLocaleTimeString('en-GB', { hour12: false });
-            document.getElementById('clock').innerText = time;
-            
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
             if (Math.random() > 0.8) {
-                const latency = Math.floor(Math.random() * 20) + 15;
-                document.getElementById('data-speed').innerText = `LATENCY: ${latency}ms`;
+                document.getElementById('data-speed').innerText = `LATENCY: ${Math.floor(Math.random() * 20) + 15}ms`;
             }
         }
         setInterval(updateClock, 1000);
 
-        function isQuotaErrorMessage(message = '') {
-            return /quota|exceed|limit|resource exhausted|429/i.test(message);
-        }
-
-        function buildOfflineAnalysis(ticker, context, reason) {
-            const cleanContext = (context || 'analisis umum').slice(0, 120);
-            const fallbackPrice = 'IDR (estimasi - cek chart realtime)';
-
-            return {
-                price: fallbackPrice,
-                target: 'IDR (tentukan dari support/resistance chart)',
-                rating: 'WAIT',
-                risk: 'MED',
-                bandar: `Data AI gateway gagal. Gunakan konfirmasi volume, broker summary, dan price action untuk ${ticker}.`,
-                tech: `Mode offline aktif. Fokus MA20/MA50, RSI, MACD, area support-resistance pada IDX:${ticker}.`,
-                fund: `Periksa laporan keuangan terbaru, pertumbuhan laba, utang, dan valuasi emiten ${ticker}.`,
-                summary: `AI online tidak tersedia sementara (${reason}). Sistem berpindah ke mode offline agar aplikasi tetap berjalan. Konteks: ${cleanContext}.`,
-                bull_percent: 50
-            };
-        }
-
-        function normalizeAnalysisData(data) {
-            const safe = data && typeof data === 'object' ? data : {};
-            const toText = (v, d = 'N/A') => (typeof v === 'string' && v.trim() ? v.trim() : d);
-            const bullRaw = Number(safe.bull_percent);
-            const bull = Number.isFinite(bullRaw) ? Math.min(100, Math.max(0, Math.round(bullRaw))) : 50;
-
-            return {
-                price: toText(safe.price, 'IDR N/A'),
-                target: toText(safe.target, 'IDR N/A'),
-                rating: toText(safe.rating, 'WAIT'),
-                risk: toText(safe.risk, 'MED'),
-                bandar: toText(safe.bandar, 'Data bandarmologi belum tersedia.'),
-                tech: toText(safe.tech, 'Data teknikal belum tersedia.'),
-                fund: toText(safe.fund, 'Data fundamental belum tersedia.'),
-                summary: toText(safe.summary, 'Ringkasan analisis belum tersedia.'),
-                bull_percent: bull
-            };
-        }
-
-        async function runAnalysis() {
+        async function runAnalysis(isAuto = false) {
             const rawTicker = document.getElementById('ticker-input').value.trim();
-            const ticker = rawTicker.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 8);
+            const ticker = rawTicker.toUpperCase().replace(/[^A-Z0-9]/g, '');
             const apiKey = keyField.value.trim();
             const userContext = document.getElementById('context').value.trim();
 
-            if (!ticker) return showNotify("Target emiten (Ticker) tidak valid.", "error");
-            if (!apiKey) return showNotify("API Key diperlukan untuk neural link.", "error");
+            if (!ticker) {
+                if(!isAuto) showNotify("Target emiten (Ticker) tidak valid.", "error");
+                return;
+            }
+            if (!apiKey) {
+                if(!isAuto) showNotify("API Key diperlukan untuk neural link.", "error");
+                return;
+            }
 
             storage.set('secure_token', apiKey);
             
@@ -482,374 +416,181 @@ codex/fix-issues-based-on-attached-screenshot-iwv1qu
             const loader = document.getElementById('loading-overlay');
             const stepText = document.getElementById('loading-step');
             const subText = document.getElementById('loading-sub');
+            const autoIndicator = document.getElementById('auto-update-indicator');
 
             try {
-                btn.disabled = true;
-                loader.classList.remove('hidden');
-                
-                stepText.innerText = "Syncing Real-Time Market Feed...";
-                renderTradingView(ticker);
-                document.getElementById('chart-title').innerText = `LIVE STREAM: IDX:${ticker} [VERIFIED DATA]`;
+                if(!isAuto) {
+                    btn.disabled = true;
+                    loader.classList.remove('hidden');
+                    stepText.innerText = "Syncing Real-Time Market Feed...";
+                    renderTradingView(ticker);
+                    document.getElementById('chart-title').innerText = `LIVE STREAM: IDX:${ticker} [VERIFIED DATA]`;
+                } else {
+                    autoIndicator.classList.remove('hidden');
+                }
 
-                stepText.innerText = "Processing Neural Engine Precision...";
+                if(!isAuto) stepText.innerText = "Processing Neural Engine Precision...";
+                
                 const result = await fetchQuantumData(apiKey, ticker, userContext, (msg) => {
-                    subText.innerText = msg;
+                    if(!isAuto) subText.innerText = msg;
                 });
                 
-                stepText.innerText = "Validating Output Accuracy...";
-                subText.innerText = "PARSING DATA STREAM...";
-                const normalizedResult = normalizeAnalysisData(result);
-                deployUI(normalizedResult);
-                updateSentiment(normalizedResult.bull_percent);
+                if(!isAuto) {
+                    stepText.innerText = "Validating Output Accuracy...";
+                    subText.innerText = "PARSING DATA STREAM...";
+                }
+
+                deployUI(result);
+                updateSentiment(result.bull_percent || 50);
                 
-                showNotify(`Analisis ${ticker} selesai dengan presisi tinggi.`, "success");
+                if(!isAuto) {
+                    showNotify(`Analisis ${ticker} selesai dengan presisi tinggi.`, "success");
+                    startAutoUpdate(); 
+                }
                 
             } catch (err) {
                 console.error("Critical System Failure:", err);
-                const rawMsg = err.message || "Kegagalan pada Quantum Core.";
-                const stalePreviewHint = /gemini-2\.5-flash-preview-09-2025/i.test(rawMsg)
-                    ? `${rawMsg} | Hint: hard refresh (Ctrl+Shift+R) dan deploy ulang branch Pages.`
-                    : rawMsg;
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-
-                const offlineResult = normalizeAnalysisData(buildOfflineAnalysis(ticker, userContext, stalePreviewHint));
-                deployUI(offlineResult);
-                updateSentiment(offlineResult.bull_percent);
-                document.getElementById('chart-title').innerText = `LIVE STREAM: IDX:${ticker} [OFFLINE AI MODE]`;
-                const modelLabel = document.getElementById('ai-model-label');
-                if (modelLabel) modelLabel.innerText = 'Hybrid Analysis: Offline Fallback';
-
-                const note = isQuotaErrorMessage(rawMsg)
-                    ? `${stalePreviewHint} | Kuota API habis, sistem dialihkan ke mode offline.`
-                    : `${stalePreviewHint} | Sistem dialihkan ke mode offline.`;
-                showNotify(note, "error");
-
-                showNotify(stalePreviewHint, "error");
- main
+                if(!isAuto) showNotify(err.message || "Kegagalan pada Quantum Core.", "error");
             } finally {
-                btn.disabled = false;
-                loader.classList.add('hidden');
-                subText.innerText = "ENCRYPTED DATA STREAM CONNECTED";
+                if(!isAuto) {
+                    btn.disabled = false;
+                    loader.classList.add('hidden');
+                    subText.innerText = "ENCRYPTED DATA STREAM CONNECTED";
+                }
+                autoIndicator.classList.add('hidden');
             }
         }
 
         async function fetchQuantumData(key, ticker, context, statusCb) {
-            const stableModelPriority = STABLE_MODELS;
+            // Prioritas model Gemini stabil (tanpa preview/exp)
+            const models = [
+                "gemini-2.0-flash",
+                "gemini-2.0-flash-lite",
+                "gemini-1.5-flash",
+                "gemini-1.5-pro"
+            ];
+            const apiVersions = ["v1beta", "v1"];
 
-            const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} dengan AKURASI DATA 100%.
+            const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} secara mendalam.
             Konteks Strategi User: ${context || 'Analisis pasar komprehensif'}.
+            Gunakan data historis dan sentimen terkini untuk memberikan panduan objektif.
 
-            PENTING: Berikan jawaban HANYA dalam format JSON mentah tanpa markdown block, dengan struktur properti:
+            OUTPUT WAJIB JSON MURNI:
             {
                 "price": "IDR ...",
                 "target": "IDR ...",
-                "rating": "A/B/C/Buy/Sell",
-                "risk": "Low/Med/High",
-                "bandar": "analisis bandarmologi singkat",
-                "tech": "analisis teknikal singkat",
-                "fund": "analisis fundamental singkat",
-                "summary": "kesimpulan panjang strategi",
+                "rating": "Strong Buy/Buy/Hold/Sell",
+                "risk": "Low/Moderate/High",
+                "bandar": "analisis ringkas aliran dana besar",
+                "tech": "analisis indikator teknikal",
+                "fund": "analisis fundamental ringkas",
+                "summary": "kesimpulan strategi lengkap",
                 "bull_percent": 0-100
             }`;
 
             const payload = {
-                contents: [{
-                    parts: [{ text: systemPrompt }]
-                }],
-                generationConfig: {
-                    temperature: 0.2,
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-                    maxOutputTokens: 1024,
-
- codex/fix-issues-based-on-attached-screenshot-iwv1qu
-                    maxOutputTokens: 1024,
-
- main
- main
-                    responseMimeType: 'application/json'
+                contents: [{ parts: [{ text: systemPrompt }] }],
+                tools: [{ "google_search": {} }],
+                generationConfig: { 
+                    temperature: 0.1,
+                    responseMimeType: "application/json"
                 }
             };
 
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-            const fetchWithExponentialBackoff = async (url, options, retries = 4, timeoutMs = 16000) => {
-                let delay = 1200;
-
-
- codex/fix-issues-based-on-attached-screenshot-iwv1qu
-            const fetchWithExponentialBackoff = async (url, options, retries = 4, timeoutMs = 16000) => {
-                let delay = 1200;
-
-            const fetchWithExponentialBackoff = async (url, options, retries = 4) => {
-                let delay = 1500;
- main
-
- main
-                for (let i = 0; i < retries; i++) {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-                    try {
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-
- codex/fix-issues-based-on-attached-screenshot-iwv1qu
- main
-                        const res = await fetch(url, { ...options, signal: controller.signal });
-
-                        if (res.status === 429 || res.status >= 500) {
-                            const retryMsg = `Server sibuk (${res.status}). Retry ${i + 1}/${retries} dalam ${Math.round(delay / 1000)}s...`;
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-
-
-                        const res = await fetch(url, options);
-
-                        if (res.status === 429) {
-                            const retryMsg = `Quota Limit. Retrying in ${delay / 1000}s...`;
- main
- main
-                            if (statusCb) statusCb(retryMsg);
-                            await new Promise(r => setTimeout(r, delay));
-                            delay *= 2;
-                            continue;
-                        }
-
-                        return res;
-                    } catch (e) {
-                        const isAbort = e?.name === 'AbortError';
-                        const networkMsg = isAbort ? 'Request timeout pada jaringan.' : 'Gangguan koneksi jaringan.';
-
-                        if (i === retries - 1) {
-                            throw new Error(`${networkMsg} Cek internet / API key restriction, lalu coba lagi.`);
-                        }
-
-                        if (statusCb) statusCb(`${networkMsg} Retry ${i + 1}/${retries}...`);
-                        await new Promise(r => setTimeout(r, delay));
-                        delay *= 2;
-                    } finally {
-                        clearTimeout(timeoutId);
-                    }
-                }
-
-                throw new Error('Request timeout setelah beberapa percobaan.');
-            };
-
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-            const buildModelEndpoint = (model) =>
-                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-
             const parseJsonFromModel = (rawText) => {
-                const cleaned = rawText
-                    .replace(/[\u200B-\u200D\uFEFF]/g, '')
-                    .replace(/```json/g, '')
-                    .replace(/```/g, '')
-                    .trim();
-
- codex/fix-issues-based-on-attached-screenshot-iwv1qu
-            const buildModelEndpoint = (model) =>
-                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-
-            const buildModelEndpoint = (apiVersion, model) =>
-                `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${key}`;
- main
-
-            const parseJsonFromModel = (rawText) => {
-                const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
- main
+                const text = (rawText || '').trim();
+                if (!text) throw new Error('Zero-Length Signal Received');
 
                 try {
-                    return JSON.parse(cleaned);
+                    return JSON.parse(text);
                 } catch (_) {
-                    const firstObjStart = cleaned.indexOf('{');
-                    const lastObjEnd = cleaned.lastIndexOf('}');
-                    if (firstObjStart !== -1 && lastObjEnd !== -1 && lastObjEnd > firstObjStart) {
-                        const maybeJson = cleaned.slice(firstObjStart, lastObjEnd + 1);
-                        return JSON.parse(maybeJson);
-                    }
-                    throw new Error('Gagal mengurai data algoritma. Silakan coba lagi.');
+                    const cleaned = text
+                        .replace(/^```json\s*/i, '')
+                        .replace(/^```\s*/i, '')
+                        .replace(/```$/i, '')
+                        .trim();
+                    return JSON.parse(cleaned);
                 }
             };
- codex/fix-issues-based-on-attached-screenshot-44hw6l
 
-            const candidateModels = stableModelPriority;
-            let lastErrorMessage = 'Quantum Link Interrupted';
+            const executeRequest = async (apiVersion, modelName) => {
+                const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${modelName}:generateContent?key=${key}`;
+                
+                let lastFetchError = null;
+                for (let attempt = 0; attempt < 5; attempt++) {
+                    const waitTime = Math.pow(2, attempt) * 1000;
+                    try {
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
 
-            for (const model of candidateModels) {
-                const endpoint = buildModelEndpoint(model);
-                if (statusCb) statusCb(`Menyambungkan model AI: ${model}...`);
-
-                const response = await fetchWithExponentialBackoff(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response) {
-                    continue;
-                }
-
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    const serverMessage = errData.error?.message || '';
-                    lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
-
-                    const modelUnavailable = response.status === 404 || /no longer available|not found|unsupported/i.test(serverMessage);
-                    const isBadRequestModelIssue = response.status === 400 && /model|version|unsupported|not found/i.test(serverMessage);
-                    const authOrRestriction = response.status === 401 || response.status === 403;
-                    const quotaIssue = isQuotaErrorMessage(serverMessage) || response.status === 429;
-
-                    if ((modelUnavailable || isBadRequestModelIssue) && model !== candidateModels[candidateModels.length - 1]) {
-                        if (statusCb) statusCb(`Model ${model} tidak cocok, mencoba model stabil berikutnya...`);
-                        continue;
-                    }
-
-                    if (quotaIssue) {
-                        throw new Error('Quota API habis / dibatasi. Gunakan API key baru atau tunggu reset kuota.');
-                    }
-
-                    if (authOrRestriction) {
-                        throw new Error(`API Key ditolak / dibatasi (${response.status}). Aktifkan Gemini API dan izinkan HTTP referrer domain app Anda.`);
-                    }
-
-                    throw new Error(lastErrorMessage);
-                }
-
-                const data = await response.json();
-                activeModel = model;
-                const modelLabel = document.getElementById('ai-model-label');
-                if (modelLabel) modelLabel.innerText = `Gemini Active: ${model}`;
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) {
-                    lastErrorMessage = 'Neural Engine return empty data.';
-                    continue;
-                }
-
-                try {
-                    return parseJsonFromModel(text);
-                } catch (e) {
-                    lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
-                    console.error('JSON Parsing failed. Raw text:', text);
-                }
-            }
-
-            throw new Error(lastErrorMessage);
-
-
-            const candidateModels = stableModelPriority;
-            let lastErrorMessage = 'Quantum Link Interrupted';
- codex/fix-issues-based-on-attached-screenshot-iwv1qu
-
-            for (const model of candidateModels) {
-                const endpoint = buildModelEndpoint(model);
-                if (statusCb) statusCb(`Menyambungkan model AI: ${model}...`);
-
-                const response = await fetchWithExponentialBackoff(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response) {
-                    continue;
-                }
-
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    const serverMessage = errData.error?.message || '';
-                    lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
-
-                    const modelUnavailable = response.status === 404 || /no longer available|not found/i.test(serverMessage);
-                    const authOrRestriction = response.status === 400 || response.status === 401 || response.status === 403;
-                    if (modelUnavailable && model !== candidateModels[candidateModels.length - 1]) {
-                        if (statusCb) statusCb(`Model ${model} tidak tersedia, mencoba model stabil berikutnya...`);
-                        continue;
-                    }
-
-                    if (authOrRestriction) {
-                        throw new Error(`API Key ditolak / dibatasi (${response.status}). Aktifkan Gemini API dan izinkan HTTP referrer domain app Anda.`);
-                    }
-
-                    throw new Error(lastErrorMessage);
-                }
-
-                const data = await response.json();
-                activeModel = model;
-                const modelLabel = document.getElementById('ai-model-label');
-                if (modelLabel) modelLabel.innerText = `Gemini Active: ${model}`;
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) {
-                    lastErrorMessage = 'Neural Engine return empty data.';
-                    continue;
-                }
-
-                try {
-                    return parseJsonFromModel(text);
-                } catch (e) {
-                    lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
-                    console.error('JSON Parsing failed. Raw text:', text);
-                }
-            }
-
-            throw new Error(lastErrorMessage);
-            const attempts = [];
-
-            for (const model of candidateModels) {
-                for (const apiVersion of API_VERSIONS) {
-                    const endpoint = buildModelEndpoint(apiVersion, model);
-                    if (statusCb) statusCb(`Menyambungkan AI: ${model} (${apiVersion})...`);
-
-                    const response = await fetchWithExponentialBackoff(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Cache-Control': 'no-cache'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response) {
-                        attempts.push(`${model}@${apiVersion}: empty-response`);
-                        continue;
-                    }
-
-                    if (!response.ok) {
-                        const errData = await response.json().catch(() => ({}));
-                        const serverMessage = errData.error?.message || '';
-                        lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
-                        attempts.push(`${model}@${apiVersion}: ${response.status}`);
-
-                        const modelUnavailable = response.status === 404 || /no longer available|not found|unsupported/i.test(serverMessage);
-                        if (modelUnavailable) {
-                            if (statusCb) statusCb(`Model/API ${model} (${apiVersion}) tidak tersedia, lanjut fallback...`);
+                        if (res.status === 404) throw new Error("Model Not Found");
+                        
+                        if (res.status === 429) {
+                            if (statusCb) statusCb(`Neural Node Busy. Retrying in ${waitTime/1000}s...`);
+                            await new Promise(r => setTimeout(r, waitTime));
                             continue;
                         }
 
-                        throw new Error(lastErrorMessage);
-                    }
+                        if (res.status === 400) {
+                             // Jika tools tidak didukung model tertentu (seperti beberapa versi flash), coba tanpa tools
+                             const backupPayload = JSON.parse(JSON.stringify(payload));
+                             delete backupPayload.tools;
+                             const backupRes = await fetch(url, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(backupPayload)
+                             });
+                             if (backupRes.ok) return await backupRes.json();
+                             
+                             const errData = await backupRes.json().catch(() => ({}));
+                             throw new Error(errData.error?.message || `Error ${backupRes.status}`);
+                        }
 
-                    const data = await response.json();
-                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (!text) {
-                        attempts.push(`${model}@${apiVersion}: empty-candidate`);
-                        lastErrorMessage = 'Neural Engine return empty data.';
-                        continue;
-                    }
+                        if (!res.ok) {
+                            const errData = await res.json().catch(() => ({}));
+                            throw new Error(errData.error?.message || `Error ${res.status}`);
+                        }
 
-                    try {
-                        const parsed = parseJsonFromModel(text);
-                        activeModel = `${model} (${apiVersion})`;
-                        const modelLabel = document.getElementById('ai-model-label');
-                        if (modelLabel) modelLabel.innerText = `Gemini Active: ${activeModel}`;
-                        return parsed;
+                        return await res.json();
                     } catch (e) {
-                        attempts.push(`${model}@${apiVersion}: parse-error`);
-                        lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
-                        console.error('JSON Parsing failed. Raw text:', text);
+                        lastFetchError = e;
+                        if (e.message === "Model Not Found") throw e; // Pindah ke model berikutnya jika 404
+                        if (attempt === 4) throw e;
+                        await new Promise(r => setTimeout(r, waitTime));
+                    }
+                }
+                throw lastFetchError;
+            };
+
+            let finalError = null;
+            for (const model of models) {
+                for (const apiVersion of apiVersions) {
+                    try {
+                        if (statusCb) statusCb(`Connecting to ${model} (${apiVersion})...`);
+                        const responseData = await executeRequest(apiVersion, model);
+                        const textContent = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+                        return parseJsonFromModel(textContent);
+                    } catch (e) {
+                        console.error(`Node ${model}@${apiVersion} Failure:`, e.message);
+                        finalError = e;
+                        if (e.message === "Model Not Found") continue;
+                        continue;
                     }
                 }
             }
+            
+            throw new Error(`Critical System Failure: All Neural Nodes Offline. Last error: ${finalError?.message || 'Unknown'}`);
+        }
 
-            throw new Error(`${lastErrorMessage}. Attempted: ${attempts.join(', ')}`);
-              main
- main
+        // AUTO UPDATE LOGIC
+        function startAutoUpdate() {
+            if (autoUpdateInterval) clearInterval(autoUpdateInterval);
+            autoUpdateInterval = setInterval(() => {
+                runAnalysis(true);
+            }, 300000); 
         }
 
         function deployUI(data) {
@@ -895,7 +636,6 @@ codex/fix-issues-based-on-attached-screenshot-iwv1qu
         function renderTradingView(symbol) {
             const container = document.getElementById('chart-container');
             container.innerHTML = ''; 
-            
             new TradingView.widget({
                 "autosize": true,
                 "symbol": "IDX:" + symbol,
@@ -937,16 +677,6 @@ codex/fix-issues-based-on-attached-screenshot-iwv1qu
         }
 
         window.onload = () => {
-            const modelLabel = document.getElementById('ai-model-label');
- codex/fix-issues-based-on-attached-screenshot-44hw6l
-            if (modelLabel) modelLabel.innerText = `Hybrid Engine Ready: ${STABLE_MODELS.join(' / ')}`;
-
- codex/fix-issues-based-on-attached-screenshot-iwv1qu
-            if (modelLabel) modelLabel.innerText = `Gemini Stable Ready: ${STABLE_MODELS.join(' / ')}`;
-
-            if (modelLabel) modelLabel.innerText = `Gemini Stable Ready: ${STABLE_MODELS.join(' / ' )}`;
- main
- main
             renderTradingView('COMPOSITE');
             updateSentiment(50);
         };
