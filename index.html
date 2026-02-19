@@ -455,9 +455,10 @@
         }
 
         async function fetchQuantumData(key, ticker, context, statusCb) {
-            const preferredModels = [
-                'gemini-2.5-flash',
-                'gemini-2.0-flash'
+            const stableModelPriority = [
+                'gemini-2.0-flash',
+                'gemini-1.5-flash',
+                'gemini-1.5-pro'
             ];
 
             const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v10. TUGAS UTAMA: Analisis saham IDX:${ticker} dengan AKURASI DATA 100%.
@@ -512,6 +513,7 @@
                 throw new Error('Request timeout setelah beberapa percobaan.');
             };
 
+            const listModelsEndpoint = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
             const buildModelEndpoint = (model) =>
                 `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
 
@@ -531,11 +533,32 @@
                 }
             };
 
+            let availableModels = [];
+            try {
+                const catalogResponse = await fetchWithExponentialBackoff(listModelsEndpoint, { method: 'GET' }, 2);
+                if (catalogResponse && catalogResponse.ok) {
+                    const catalogData = await catalogResponse.json();
+                    availableModels = (catalogData.models || [])
+                        .map((m) => (m.name || '').replace('models/', ''))
+                        .filter(Boolean);
+                }
+            } catch (e) {
+                console.warn('Gagal memuat katalog model, menggunakan fallback lokal.', e);
+            }
+
+            const candidateModels = availableModels.length
+                ? stableModelPriority.filter((model) => availableModels.includes(model))
+                : stableModelPriority;
+
+            if (!candidateModels.length) {
+                throw new Error('Tidak ada model Gemini stabil yang tersedia untuk API key ini.');
+            }
+
             let lastErrorMessage = 'Quantum Link Interrupted';
 
-            for (const model of preferredModels) {
+            for (const model of candidateModels) {
                 const endpoint = buildModelEndpoint(model);
-                if (statusCb) statusCb(`Menyambungkan model AI: ${model}...`);
+                if (statusCb) statusCb(`Menyambungkan model AI stabil: ${model}...`);
 
                 const response = await fetchWithExponentialBackoff(endpoint, {
                     method: 'POST',
@@ -553,8 +576,8 @@
                     lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
 
                     const modelUnavailable = response.status === 404 || /no longer available|not found/i.test(serverMessage);
-                    if (modelUnavailable && model !== preferredModels[preferredModels.length - 1]) {
-                        if (statusCb) statusCb(`Model ${model} tidak tersedia, mencoba model cadangan...`);
+                    if (modelUnavailable && model !== candidateModels[candidateModels.length - 1]) {
+                        if (statusCb) statusCb(`Model ${model} tidak tersedia, mencoba model stabil berikutnya...`);
                         continue;
                     }
                     throw new Error(lastErrorMessage);
