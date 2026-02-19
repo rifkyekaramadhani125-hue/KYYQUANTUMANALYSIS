@@ -385,6 +385,10 @@
             'gemini-1.5-flash',
             'gemini-1.5-pro'
         ];
+codex/fix-issues-based-on-attached-screenshot-iwv1qu
+
+        const API_VERSIONS = ['v1beta', 'v1'];
+ main
         let activeModel = 'N/A';
 
         const storage = {
@@ -491,23 +495,38 @@
                 }],
                 generationConfig: {
                     temperature: 0.2,
+ codex/fix-issues-based-on-attached-screenshot-iwv1qu
                     maxOutputTokens: 1024,
+
+ main
                     responseMimeType: 'application/json'
                 }
             };
 
+ codex/fix-issues-based-on-attached-screenshot-iwv1qu
             const fetchWithExponentialBackoff = async (url, options, retries = 4, timeoutMs = 16000) => {
                 let delay = 1200;
+
+            const fetchWithExponentialBackoff = async (url, options, retries = 4) => {
+                let delay = 1500;
+ main
 
                 for (let i = 0; i < retries; i++) {
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
                     try {
+ codex/fix-issues-based-on-attached-screenshot-iwv1qu
                         const res = await fetch(url, { ...options, signal: controller.signal });
 
                         if (res.status === 429 || res.status >= 500) {
                             const retryMsg = `Server sibuk (${res.status}). Retry ${i + 1}/${retries} dalam ${Math.round(delay / 1000)}s...`;
+
+                        const res = await fetch(url, options);
+
+                        if (res.status === 429) {
+                            const retryMsg = `Quota Limit. Retrying in ${delay / 1000}s...`;
+ main
                             if (statusCb) statusCb(retryMsg);
                             await new Promise(r => setTimeout(r, delay));
                             delay *= 2;
@@ -534,8 +553,13 @@
                 throw new Error('Request timeout setelah beberapa percobaan.');
             };
 
+ codex/fix-issues-based-on-attached-screenshot-iwv1qu
             const buildModelEndpoint = (model) =>
                 `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+
+            const buildModelEndpoint = (apiVersion, model) =>
+                `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${key}`;
+ main
 
             const parseJsonFromModel = (rawText) => {
                 const cleaned = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -555,6 +579,7 @@
 
             const candidateModels = stableModelPriority;
             let lastErrorMessage = 'Quantum Link Interrupted';
+ codex/fix-issues-based-on-attached-screenshot-iwv1qu
 
             for (const model of candidateModels) {
                 const endpoint = buildModelEndpoint(model);
@@ -608,6 +633,66 @@
             }
 
             throw new Error(lastErrorMessage);
+            const attempts = [];
+
+            for (const model of candidateModels) {
+                for (const apiVersion of API_VERSIONS) {
+                    const endpoint = buildModelEndpoint(apiVersion, model);
+                    if (statusCb) statusCb(`Menyambungkan AI: ${model} (${apiVersion})...`);
+
+                    const response = await fetchWithExponentialBackoff(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response) {
+                        attempts.push(`${model}@${apiVersion}: empty-response`);
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        const serverMessage = errData.error?.message || '';
+                        lastErrorMessage = serverMessage || 'Quantum Link Interrupted';
+                        attempts.push(`${model}@${apiVersion}: ${response.status}`);
+
+                        const modelUnavailable = response.status === 404 || /no longer available|not found|unsupported/i.test(serverMessage);
+                        if (modelUnavailable) {
+                            if (statusCb) statusCb(`Model/API ${model} (${apiVersion}) tidak tersedia, lanjut fallback...`);
+                            continue;
+                        }
+
+                        throw new Error(lastErrorMessage);
+                    }
+
+                    const data = await response.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!text) {
+                        attempts.push(`${model}@${apiVersion}: empty-candidate`);
+                        lastErrorMessage = 'Neural Engine return empty data.';
+                        continue;
+                    }
+
+                    try {
+                        const parsed = parseJsonFromModel(text);
+                        activeModel = `${model} (${apiVersion})`;
+                        const modelLabel = document.getElementById('ai-model-label');
+                        if (modelLabel) modelLabel.innerText = `Gemini Active: ${activeModel}`;
+                        return parsed;
+                    } catch (e) {
+                        attempts.push(`${model}@${apiVersion}: parse-error`);
+                        lastErrorMessage = e.message || 'Gagal mengurai data algoritma. Silakan coba lagi.';
+                        console.error('JSON Parsing failed. Raw text:', text);
+                    }
+                }
+            }
+
+            throw new Error(`${lastErrorMessage}. Attempted: ${attempts.join(', ')}`);
+              main
         }
 
         function deployUI(data) {
@@ -696,7 +781,11 @@
 
         window.onload = () => {
             const modelLabel = document.getElementById('ai-model-label');
+ codex/fix-issues-based-on-attached-screenshot-iwv1qu
             if (modelLabel) modelLabel.innerText = `Gemini Stable Ready: ${STABLE_MODELS.join(' / ')}`;
+
+            if (modelLabel) modelLabel.innerText = `Gemini Stable Ready: ${STABLE_MODELS.join(' / ' )}`;
+ main
             renderTradingView('COMPOSITE');
             updateSentiment(50);
         };
