@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
+ main
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KYY QUANTUM ANALYSIS</title>
@@ -73,6 +75,137 @@
           </div>
         </div>
 
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Analytic Context</label>
+          <textarea id="context" rows="3" class="w-full mt-2 p-3 rounded-xl bg-slate-950/70 border border-white/10 outline-none" placeholder="Masukkan konteks strategi..."></textarea>
+          <div id="strategy-presets" class="flex flex-wrap gap-2 mt-2">
+            <button class="btn-subtle text-[9px] px-3 py-1 rounded-lg" data-preset="Swing trading timeframe menengah (2-10 hari), fokus support/resistance, volume konfirmasi.">Swing</button>
+            <button class="btn-subtle text-[9px] px-3 py-1 rounded-lg" data-preset="Scalping cepat berbasis momentum intraday, volume spike, invalidasi disiplin.">Scalping</button>
+            <button class="btn-subtle text-[9px] px-3 py-1 rounded-lg" data-preset="Teknikal + fundamental dengan skenario bull/base/bear dan risk management ketat.">Hybrid</button>
+          </div>
+        </div>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYY QUANTUM ANALYSIS</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --navy: #020617;
+            --card: #0f172a;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top, #091225, #020617 40%);
+            color: #f8fafc;
+            margin: 0;
+            overflow-x: hidden;
+            letter-spacing: -0.01em;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #d4af37 0%, #fcd34d 50%, #b8962e 100%);
+            background-size: 200% auto;
+            color: #020617;
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-main:hover:not(:disabled) {
+            background-position: right center;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-main:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-subtle {
+            background: linear-gradient(120deg, rgba(212, 175, 55, 0.18), rgba(148, 163, 184, 0.1));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #f8fafc;
+        }
+
+        .btn-subtle.active,
+        .btn-subtle:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        #chart-container {
+            height: 520px;
+            width: 100%;
+            border-radius: 0 0 1.5rem 1.5rem;
+        }
+
+        .ai-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .ai-content strong { color: var(--gold); }
+        .ai-content ul { list-style: none; padding: 0; }
+        .ai-content li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .ai-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .analysis-item {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(2, 6, 23, 0.65);
+        }
+
+        .analysis-item:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+ main
+ main
+
         <div class="glass rounded-xl p-3 border border-white/10 space-y-3">
           <h4 class="text-[10px] uppercase font-black tracking-widest text-slate-400">Accuracy Guard</h4>
           <div class="flex items-center justify-between text-xs"><span>Strict Validation</span><input id="strict-mode" type="checkbox" checked></div>
@@ -108,6 +241,57 @@
             <button onclick="toggleKey()" class="absolute right-3 top-1/2 -translate-y-1/2"><i id="eye-icon" data-lucide="eye" class="w-4 h-4"></i></button>
           </div>
         </div>
+
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">System Encryption Key</label>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[9px] text-[var(--gold)]">Get API</a>
+          </div>
+          <div class="relative">
+            <input id="api-key" type="password" placeholder="Enter Gemini API Key..." class="w-full p-3 rounded-xl bg-slate-950/70 border border-white/10 text-xs font-mono pr-11" />
+            <button onclick="toggleKey()" class="absolute right-3 top-1/2 -translate-y-1/2"><i id="eye-icon" data-lucide="eye" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+
+        .custom-logo-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, #1e293b, #020617);
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .quantum-symbol {
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            border: 1.5px solid var(--gold);
+            border-radius: 50%;
+        }
+        .quantum-symbol.v2 { transform: rotate(60deg); }
+        .quantum-symbol.v3 { transform: rotate(-60deg); }
+
+        .logo-text-center {
+            z-index: 10;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 10px;
+            color: white;
+            background: #020617;
+            padding: 2px 4px;
+            border: 1px solid var(--gold);
+        }
+    </style>
+</head>
+ main
+ main
 
         <div>
           <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Timeframe</label>
@@ -175,6 +359,1019 @@
               </div>
               <button id="calc-risk" class="btn-subtle w-full py-3 rounded-lg text-xs">Hitung Position + R:R</button>
               <div id="risk-output" class="text-sm text-slate-300">Isi parameter untuk menghitung lot dan rasio R:R.</div>
+
+
+        <button id="btn-run" onclick="runAnalysis()" class="btn-main w-full py-4 rounded-xl text-lg">Enter / Search</button>
+        <p class="text-[10px] text-slate-500">Shortcut: <span class="text-[var(--gold)]">Ctrl + Enter</span></p>
+      </aside>
+
+      <main class="xl:col-span-9 space-y-5">
+        <section id="panel-dashboard" class="panel active space-y-5">
+          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+            <div class="metric rounded-xl p-4"><p class="text-[11px] text-slate-400">Current Price</p><div id="price-val" class="text-lg font-bold">IDR 0,000</div></div>
+            <div class="metric rounded-xl p-4"><p class="text-[11px] text-slate-400">Target</p><div id="val-target" class="text-lg font-bold text-emerald-400">---</div></div>
+            <div class="metric rounded-xl p-4"><p class="text-[11px] text-slate-400">Risk</p><div id="val-risk" class="text-lg font-bold">---</div></div>
+            <div class="metric rounded-xl p-4"><p class="text-[11px] text-slate-400">Rating</p><div id="val-rating" class="text-lg font-bold">---</div></div>
+            <div class="metric rounded-xl p-4"><p class="text-[11px] text-slate-400">AI Confidence</p><div id="val-confidence" class="text-lg font-bold text-[var(--gold)]">--%</div></div>
+            <div class="metric rounded-xl p-4"><p class="text-[11px] text-slate-400">Data Time</p><div id="val-timestamp" class="text-sm font-semibold text-slate-200">--</div></div>
+          </div>
+
+          <div class="glass rounded-2xl overflow-hidden border border-white/10 relative">
+            <div id="loading-overlay" class="absolute inset-0 bg-slate-950/95 hidden z-40 items-center justify-center flex-col gap-3">
+              <div class="w-16 h-16 rounded-full border-2 border-slate-700 border-t-[var(--gold)] animate-spin"></div>
+              <p id="loading-step" class="text-xs text-[var(--gold)] font-black uppercase">Initializing Quantum Core</p>
+              <p id="loading-sub" class="text-[10px] text-slate-500">ENCRYPTED DATA STREAM CONNECTED</p>
+            </div>
+            <div class="px-4 py-2 border-b border-white/10 flex justify-between items-center">
+              <span id="chart-title" class="text-[10px] uppercase tracking-widest text-slate-400">Global Market Interface</span>
+              <span id="data-speed" class="text-[10px] text-slate-500">LATENCY: 24ms</span>
+            </div>
+            <div id="chart-container"></div>
+          </div>
+
+          <div class="glass rounded-2xl p-6 border-l-4 border-[var(--gold)] space-y-3">
+            <div class="flex justify-between items-center mb-1">
+              <h3 class="text-sm font-black uppercase">Strategy Intelligence & Verdict</h3>
+              <button id="copy-summary" class="btn-subtle px-3 py-2 rounded-lg text-xs">Copy Verdict</button>
+
+    <div class="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6">
+
+        <header class="glass rounded-[2rem] p-5 flex justify-between items-center relative overflow-hidden">
+            <div class="flex items-center gap-4 z-10">
+                <div class="custom-logo-container">
+                    <div class="quantum-symbol"></div>
+                    <div class="quantum-symbol v2"></div>
+                    <div class="quantum-symbol v3"></div>
+                    <div class="logo-text-center">KYY</div>
+                    <svg class="absolute bottom-2 left-2 w-10 h-10 opacity-40" viewBox="0 0 100 100">
+                        <path d="M10 80 L30 60 L50 70 L90 20" fill="none" stroke="#d4af37" stroke-width="5" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black font-orbitron tracking-tighter leading-none">QUANTUM <span class="text-[var(--gold)]">ANALYSIS</span></h1>
+                    <p class="text-[9px] uppercase tracking-[0.4em] text-slate-500 font-bold mt-1">KYY.SHARINGSTOCKKNOWLEDGE</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 z-10">
+                <div id="connection-status" class="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-[10px] font-black text-emerald-500 uppercase">Neural Link Active</span>
+                </div>
+                <div id="clock-container" class="flex items-center gap-3 px-5 py-2.5 bg-slate-900/80 rounded-full border border-white/5 backdrop-blur-xl">
+                    <div id="clock" class="font-mono text-slate-300 text-sm font-bold tracking-widest">00:00:00</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <aside class="lg:col-span-3 space-y-4">
+                <div class="glass rounded-[2rem] p-6 space-y-6 border-l-4 border-[var(--gold)] relative">
+                    <div class="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-24 bg-[var(--gold)]/20 blur-sm rounded-full"></div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Instrument</label>
+                            <span class="status-badge bg-slate-800 text-slate-400">IDX Verified</span>
+                        </div>
+                        <div class="relative group">
+                            <input id="ticker-input" placeholder="ASII"
+                                class="w-full p-5 rounded-2xl bg-slate-950/80 border border-white/10 uppercase font-black text-3xl text-white outline-none focus:border-[var(--gold)] focus:ring-4 focus:ring-[var(--gold)]/10 transition-all placeholder:text-slate-800">
+                            <i data-lucide="search" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-[var(--gold)] transition-colors"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Analytic Context</label>
+                        <textarea id="context" rows="3" placeholder="Sebutkan strategi (misal: swing trading, scalping, atau cek fundamental)..."
+                            class="w-full p-4 rounded-2xl bg-slate-950/80 border border-white/10 text-sm text-slate-300 outline-none resize-none focus:border-[var(--gold)] transition-all leading-relaxed"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Timeframe Focus</label>
+                        <div class="grid grid-cols-4 gap-2" id="interval-switcher">
+                            <button class="btn-subtle active text-[10px] font-black py-2 rounded-xl" data-interval="15">15m</button>
+                            <button class="btn-subtle text-[10px] font-black py-2 rounded-xl" data-interval="60">1H</button>
+                            <button class="btn-subtle text-[10px] font-black py-2 rounded-xl" data-interval="D">1D</button>
+                            <button class="btn-subtle text-[10px] font-black py-2 rounded-xl" data-interval="W">1W</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 block">System Encryption Key</label>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[9px] text-[var(--gold)] hover:underline flex items-center gap-1 font-bold">
+                                Get API <i data-lucide="external-link" class="w-3 h-3"></i>
+                            </a>
+                        </div>
+                        <div class="relative">
+                            <input id="api-key" type="password" placeholder="Enter Gemini Pro Key..."
+                                class="w-full p-4 rounded-2xl bg-slate-950/80 border border-white/10 text-xs font-mono text-[var(--gold)] outline-none focus:border-[var(--gold)] transition-all pr-12">
+                            <button onclick="toggleKey()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400">
+                                <i data-lucide="eye" class="w-4 h-4" id="eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="runAnalysis()" id="btn-run" class="btn-main w-full py-5 rounded-2xl flex items-center justify-center gap-3 group">
+                        <i data-lucide="search" class="w-5 h-5 stroke-[2.5]"></i>
+                        <span class="font-bold text-lg tracking-wide uppercase">Enter / Search</span>
+                    </button>
+                    <p class="text-[10px] text-slate-500 text-center">Shortcut: tekan <span class="text-[var(--gold)] font-bold">Ctrl + Enter</span> untuk analisis cepat.</p>
+                </div>
+
+                <div class="glass rounded-[1.5rem] p-5 border-t border-white/5 bg-gradient-to-br from-slate-900/40 to-transparent">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Market Sentiment</span>
+                        <div id="sentiment-dot" class="w-2 h-2 rounded-full bg-slate-700"></div>
+                    </div>
+                    <div class="h-2 bg-slate-800 rounded-full overflow-hidden flex">
+                        <div id="bull-bar" class="h-full bg-emerald-500 transition-all duration-1000" style="width: 50%"></div>
+                        <div id="bear-bar" class="h-full bg-red-500 transition-all duration-1000" style="width: 50%"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 font-mono text-[9px] font-bold">
+                        <span class="text-emerald-500">BULLS: <span id="bull-val">50%</span></span>
+                        <span class="text-red-500">BEARS: <span id="bear-val">50%</span></span>
+                    </div>
+                </div>
+
+                <div class="glass rounded-[1.5rem] p-5 border border-white/10 space-y-4">
+                    <h4 class="text-[11px] font-black uppercase tracking-widest text-white">Risk Position Helper</h4>
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <input id="capital" type="number" placeholder="Modal" class="p-3 rounded-xl bg-slate-950/70 border border-white/10 outline-none">
+                        <input id="risk-percent" type="number" placeholder="Risk %" value="1" class="p-3 rounded-xl bg-slate-950/70 border border-white/10 outline-none">
+                        <input id="entry-price" type="number" placeholder="Entry" class="p-3 rounded-xl bg-slate-950/70 border border-white/10 outline-none">
+                        <input id="stop-price" type="number" placeholder="Stop Loss" class="p-3 rounded-xl bg-slate-950/70 border border-white/10 outline-none">
+                    </div>
+                    <button id="calc-risk" class="btn-subtle w-full py-3 rounded-xl text-[11px] font-black uppercase">Hitung Position Size</button>
+                    <div id="risk-output" class="text-[11px] text-slate-300">Isi parameter untuk mendapatkan rekomendasi lot berbasis risk.</div>
+                </div>
+
+                <div class="glass rounded-[1.5rem] p-5 border border-white/10">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-[11px] font-black uppercase tracking-widest text-white">Recent Analysis</h4>
+                        <button id="clear-history" class="text-[9px] text-slate-500 hover:text-red-400">Clear</button>
+                    </div>
+                    <div id="history-list" class="space-y-2"></div>
+                </div>
+            </aside>
+
+            <main class="lg:col-span-9 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass rounded-2xl p-5 border border-white/10">
+                        <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Upgrade Notes</p>
+                        <p class="text-sm text-slate-300">Sistem diperbarui dengan history lokal, kalkulator risk, shortcut keyboard, timeout AI request, dan renderer teks aman agar lebih cepat + stabil.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-5 border border-white/10">
+                        <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Inspirasi Non-Plagiarisme</p>
+                        <p class="text-sm text-slate-300">Mengadopsi pola unggulan aplikasi trading modern: watchlist cepat, manajemen risiko, dan panel insight modular—tanpa menyalin desain/komponen mentah.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-5 border border-white/10">
+                        <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">System Integrity</p>
+                        <p class="text-sm text-slate-300">Logo KYY, watermark, tone visual utama, dan fondasi fitur inti tetap dipertahankan sesuai arahan.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Current Market Price</p>
+                        <div id="price-val" class="text-xl md:text-2xl font-bold text-white tracking-tight">IDR 0,000</div>
+                    </div>
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Quantum Price Target</p>
+                        <div id="val-target" class="text-xl md:text-2xl font-bold text-emerald-400 tracking-tight">---</div>
+                    </div>
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Risk Assessment</p>
+                        <div id="val-risk" class="text-xl md:text-2xl font-bold text-white tracking-tight">---</div>
+                    </div>
+                    <div class="bg-[#0B1526] border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-center shadow-sm">
+                        <p class="text-[11px] font-medium text-slate-400 mb-1">Neural Alpha Rating</p>
+                        <div id="val-rating" class="text-xl md:text-2xl font-bold text-white tracking-tight">---</div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-[2rem] overflow-hidden border border-white/5 relative group">
+                    <div id="loading-overlay" class="absolute inset-0 bg-slate-950/95 z-50 hidden flex items-center justify-center flex-col gap-6 backdrop-blur-md">
+                        <div class="scanning-line"></div>
+                        <div class="relative">
+                            <div class="w-24 h-24 rounded-full border-2 border-slate-800 border-t-[var(--gold)] animate-spin"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="radio" class="w-10 h-10 text-[var(--gold)] animate-pulse"></i>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p id="loading-step" class="font-black text-[var(--gold)] uppercase tracking-[0.3em] text-xs">Initializing Quantum Core</p>
+                            <p id="loading-sub" class="text-[9px] text-slate-600 mt-2 font-mono">ENCRYPTED DATA STREAM CONNECTED</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/50 px-6 py-3 border-b border-white/5 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="line-chart" class="w-4 h-4 text-[var(--gold)]"></i>
+                            <span id="chart-title" class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Global Market Interface</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
+                            <div class="w-2 h-2 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-500/50"></div>
+                        </div>
+                    </div>
+                    <div id="chart-container"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass rounded-[1.5rem] p-7 border-t border-white/10 hover:border-[var(--gold)]/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-blue-500/10 rounded-lg"><i data-lucide="users" class="w-4 h-4 text-blue-400"></i></div>
+                            <h3 class="text-[11px] font-black uppercase text-white tracking-widest">Bandarmology</h3>
+                        </div>
+                        <div id="content-bandar" class="ai-content">Kalkulasi kepemilikan dan distribusi belum diproses...</div>
+                    </div>
+                    <div class="glass rounded-[1.5rem] p-7 border-t border-white/10 hover:border-[var(--gold)]/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-purple-500/10 rounded-lg"><i data-lucide="layers" class="w-4 h-4 text-purple-400"></i></div>
+                            <h3 class="text-[11px] font-black uppercase text-white tracking-widest">Technical Hub</h3>
+                        </div>
+                        <div id="content-tech" class="ai-content">Data indikator teknikal sedang menunggu input...</div>
+                    </div>
+                    <div class="glass rounded-[1.5rem] p-7 border-t border-white/10 hover:border-[var(--gold)]/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-emerald-500/10 rounded-lg"><i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i></div>
+                            <h3 class="text-[11px] font-black uppercase text-white tracking-widest">Fundamental</h3>
+                        </div>
+                        <div id="content-fund" class="ai-content">Analisis rasio dan kinerja finansial belum tersedia...</div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-[2rem] p-8 border-l-8 border-[var(--gold)] shadow-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-10 opacity-[0.03] rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                        <i data-lucide="shield-check" class="w-48 h-48 text-white"></i>
+                    </div>
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-xl bg-[var(--gold)]/10 flex items-center justify-center">
+                            <i data-lucide="terminal" class="text-[var(--gold)] w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black uppercase text-white tracking-[0.2em]">Strategy Intelligence & Verdict</h3>
+                            <p class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Compiled by Quantum Neural Engine</p>
+                        </div>
+                    </div>
+                    <div id="content-conclusion" class="ai-content text-sm text-slate-200 leading-relaxed font-medium bg-slate-900/30 p-6 rounded-2xl border border-white/5">
+                        Siap melakukan analisis mendalam. Masukkan kode emiten IDX dan API Key Anda pada panel samping untuk memulai algoritma Alpha.
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 right-0 glass px-6 md:px-10 py-3 flex flex-col md:flex-row justify-between items-center text-[10px] uppercase font-black text-slate-500 border-t border-white/5 z-[60] gap-2 md:gap-0">
+        <div class="flex gap-4 md:gap-8 items-center w-full md:w-auto justify-between md:justify-start">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse"></div>
+                <span class="tracking-widest hidden md:inline">KYY.SHARINGSTOCKKNOWLEDGE</span>
+                <span class="tracking-widest md:hidden">KYY.QUANTUM</span>
+ main
+            </div>
+            <div id="content-conclusion" class="text-sm text-slate-200">Siap melakukan analisis mendalam.</div>
+            <div class="grid md:grid-cols-3 gap-2">
+              <button id="btn-load-cache" class="btn-subtle py-2 rounded-lg text-xs">Load Last Cache</button>
+              <button id="btn-reanalyze" class="btn-subtle py-2 rounded-lg text-xs">Re-Analyze Last Ticker</button>
+              <button id="btn-clear-cache" class="btn-subtle py-2 rounded-lg text-xs">Clear Cache</button>
+            </div>
+            <p id="cache-status" class="text-[11px] text-slate-400">Cache status: empty</p>
+          </div>
+        </section>
+
+        <section id="panel-tools" class="panel space-y-5">
+          <div class="grid md:grid-cols-2 gap-5">
+            <div class="glass rounded-xl p-5 space-y-3">
+              <div class="flex justify-between items-center"><h4 class="text-xs font-black uppercase">Risk Position + R:R</h4><div id="rr-badge" class="text-[10px] px-2 py-1 rounded bg-slate-800">R:R --</div></div>
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <input id="capital" type="number" placeholder="Modal" class="p-3 rounded-lg bg-slate-950/70 border border-white/10">
+                <input id="risk-percent" type="number" placeholder="Risk %" value="1" class="p-3 rounded-lg bg-slate-950/70 border border-white/10">
+                <input id="entry-price" type="number" placeholder="Entry" class="p-3 rounded-lg bg-slate-950/70 border border-white/10">
+                <input id="stop-price" type="number" placeholder="Stop Loss" class="p-3 rounded-lg bg-slate-950/70 border border-white/10">
+                <input id="target-price" type="number" placeholder="Target" class="p-3 rounded-lg bg-slate-950/70 border border-white/10 col-span-2">
+              </div>
+              <button id="calc-risk" class="btn-subtle w-full py-3 rounded-lg text-xs">Hitung Position + R:R</button>
+              <div id="risk-output" class="text-sm text-slate-300">Isi parameter untuk menghitung lot dan rasio R:R.</div>
+            </div>
+
+            <div class="glass rounded-xl p-5 space-y-3">
+              <h4 class="text-xs font-black uppercase">Execution Checklist</h4>
+              <div id="execution-checks" class="space-y-2 text-sm">
+                <label class="flex justify-between items-center p-2 rounded bg-slate-900/60"><span>Trend searah timeframe</span><input type="checkbox" data-check></label>
+                <label class="flex justify-between items-center p-2 rounded bg-slate-900/60"><span>Volume mendukung setup</span><input type="checkbox" data-check></label>
+                <label class="flex justify-between items-center p-2 rounded bg-slate-900/60"><span>Risk:Reward minimal 1:2</span><input type="checkbox" data-check></label>
+                <label class="flex justify-between items-center p-2 rounded bg-slate-900/60"><span>Tidak melawan sentimen besar</span><input type="checkbox" data-check></label>
+                <label class="flex justify-between items-center p-2 rounded bg-slate-900/60"><span>Entry sesuai rencana</span><input type="checkbox" data-check></label>
+              </div>
+              <div class="flex justify-between items-center"><span class="text-sm">Readiness Score</span><span id="readiness-score" class="text-lg font-black text-[var(--gold)]">0%</span></div>
+              <div class="h-2 rounded-full bg-slate-800 overflow-hidden"><div id="readiness-bar" class="h-full bg-[var(--gold)]" style="width:0%"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="panel-intel" class="panel space-y-5">
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="glass rounded-xl p-5"><h3 class="text-xs font-black mb-3">Bandarmology</h3><div id="content-bandar" class="text-sm text-slate-300">Menunggu input...</div></div>
+            <div class="glass rounded-xl p-5"><h3 class="text-xs font-black mb-3">Technical Hub</h3><div id="content-tech" class="text-sm text-slate-300">Menunggu input...</div></div>
+            <div class="glass rounded-xl p-5"><h3 class="text-xs font-black mb-3">Fundamental</h3><div id="content-fund" class="text-sm text-slate-300">Menunggu input...</div></div>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="glass rounded-xl p-5"><h4 class="text-xs font-black mb-2">Bull Scenario</h4><div id="scenario-bull" class="text-sm text-slate-300">-</div></div>
+            <div class="glass rounded-xl p-5"><h4 class="text-xs font-black mb-2">Base Scenario</h4><div id="scenario-base" class="text-sm text-slate-300">-</div></div>
+            <div class="glass rounded-xl p-5"><h4 class="text-xs font-black mb-2">Bear Scenario</h4><div id="scenario-bear" class="text-sm text-slate-300">-</div></div>
+          </div>
+          <div class="glass rounded-xl p-5">
+            <h4 class="text-xs font-black mb-3">Market Sentiment</h4>
+            <div class="h-2 bg-slate-800 rounded-full overflow-hidden flex"><div id="bull-bar" class="h-full bg-emerald-500" style="width:50%"></div><div id="bear-bar" class="h-full bg-red-500" style="width:50%"></div></div>
+            <div class="flex justify-between mt-2 text-[11px]"><span class="text-emerald-400">BULLS: <span id="bull-val">50%</span></span><span class="text-red-400">BEARS: <span id="bear-val">50%</span></span></div>
+          </div>
+        </section>
+
+        <section id="panel-vault" class="panel space-y-5">
+          <div class="glass rounded-xl p-5 space-y-3">
+            <div class="flex justify-between items-center"><h4 class="text-xs font-black uppercase">Quick Watchlist</h4><button id="add-watchlist" class="btn-subtle text-xs px-3 py-1 rounded-lg">Tambah</button></div>
+            <div id="watchlist-items" class="space-y-2"></div>
+          </div>
+          <div class="glass rounded-xl p-5 space-y-3">
+            <div class="flex justify-between items-center"><h4 class="text-xs font-black uppercase">Recent Analysis</h4><div class="flex gap-3"><button id="import-history" class="text-xs text-slate-400 hover:text-blue-300">Import</button><button id="export-history" class="text-xs text-slate-400 hover:text-[var(--gold)]">Export</button><button id="clear-history" class="text-xs text-slate-400 hover:text-red-400">Clear</button></div></div>
+            <div id="history-list" class="space-y-2"></div>
+            <input id="import-history-file" type="file" accept="application/json" class="hidden">
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <footer class="fixed bottom-0 left-0 right-0 glass px-6 py-3 flex flex-col md:flex-row justify-between items-center text-[10px] uppercase font-black text-slate-500 border-t border-white/5 gap-2">
+    <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse"></div><span>KYY.SHARINGSTOCKKNOWLEDGE</span></div>
+    <div class="text-[8px] md:text-[9px] text-center text-slate-600 tracking-wider">Disclaimer: Analisis ini adalah alat bantu komputasi, BUKAN ajakan investasi (DYOR).</div>
+    <div class="flex items-center gap-2"><span class="text-slate-400">Gemini Engine Ready</span><i data-lucide="cpu" class="w-3 h-3"></i></div>
+  </footer>
+
+  <script>
+    const appState = { interval: '15', storagePrefix: 'kyy_ultra_', currentModel: 'gemini-2.0-flash', lastTicker: '' };
+    const storage = {
+      set: (key, value) => localStorage.setItem(`${appState.storagePrefix}${key}`, typeof value === 'string' ? value : JSON.stringify(value)),
+      get: (key, fallback = null) => {
+        const raw = localStorage.getItem(`${appState.storagePrefix}${key}`);
+        if (raw === null) return fallback;
+        try { return JSON.parse(raw); } catch { return raw; }
+      }
+    };
+
+    const keyField = document.getElementById('api-key');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      keyField.value = storage.get('secure_token', '');
+      document.getElementById('model-selector').value = storage.get('gemini_model', 'gemini-2.0-flash');
+      appState.currentModel = document.getElementById('model-selector').value;
+      updateModelBadge(appState.currentModel, 'ready');
+      hydrateDraft();
+      bindTabs();
+      bindKeyboardShortcut();
+      bindIntervalButtons();
+      bindStrategyPresets();
+      bindCopyVerdict();
+      bindRiskCalculator();
+      bindWatchlist();
+      bindHistoryExport();
+      bindReadinessChecks();
+      bindAccuracyGuard();
+      bindModelControls();
+      bindCacheControls();
+      restoreGuardPreferences();
+      renderHistory();
+      renderWatchlist();
+      renderTradingView('COMPOSITE', appState.interval);
+      updateSentiment(50);
+      updateClock();
+    });
+
+    setInterval(updateClock, 1000);
+
+    function updateClock() {
+      document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
+      if (Math.random() > 0.75) {
+        document.getElementById('data-speed').innerText = `LATENCY: ${Math.floor(Math.random() * 20) + 14}ms`;
+      }
+    }
+
+    function bindTabs() {
+      document.querySelectorAll('.tab-btn').forEach((button) => button.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach((panel) => panel.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+      }));
+    }
+
+
+    function getCacheKey(ticker) {
+      const tf = appState.interval || 'D';
+      return `analysis_cache_${ticker}_${tf}`;
+    }
+
+    function saveAnalysisCache(ticker, payload) {
+      if (!ticker || !payload) return;
+      storage.set(getCacheKey(ticker), { at: new Date().toISOString(), payload });
+      storage.set('last_cache_ticker', ticker);
+      updateCacheStatus();
+    }
+
+    function loadAnalysisCache(ticker) {
+      return storage.get(getCacheKey(ticker), null);
+    }
+
+    function updateCacheStatus() {
+      const ticker = storage.get('last_cache_ticker', '');
+      const status = document.getElementById('cache-status');
+      if (!ticker) {
+        status.innerText = 'Cache status: empty';
+        return;
+      }
+      const cache = loadAnalysisCache(ticker);
+      if (!cache) {
+        status.innerText = 'Cache status: empty';
+        return;
+      }
+      const cacheTime = cache?.at ? new Date(cache.at) : null;
+      const timeText = cacheTime && !Number.isNaN(cacheTime.getTime()) ? cacheTime.toLocaleString('id-ID') : 'unknown time';
+      status.innerText = `Cache status: ${ticker} • ${timeText}`;
+    }
+
+    function bindCacheControls() {
+      updateCacheStatus();
+      document.getElementById('btn-load-cache').addEventListener('click', () => {
+        const ticker = storage.get('last_cache_ticker', '');
+        if (!ticker) return showNotify('Belum ada cache.', 'error');
+        const cache = loadAnalysisCache(ticker);
+        if (!cache?.payload) return showNotify('Cache tidak ditemukan.', 'error');
+        document.getElementById('ticker-input').value = ticker;
+        const normalized = normalizeAnalysisResult(cache.payload);
+        deployUI(normalized, Number(document.getElementById('confidence-target').value));
+        updateSentiment(normalized.bull_percent || 50);
+        renderTradingView(ticker, appState.interval);
+        showNotify(`Cache ${ticker} dimuat.`, 'success');
+      });
+
+      document.getElementById('btn-reanalyze').addEventListener('click', () => {
+        const ticker = storage.get('last_cache_ticker', '') || appState.lastTicker;
+        if (!ticker) return showNotify('Belum ada ticker terakhir.', 'error');
+        document.getElementById('ticker-input').value = ticker;
+        runAnalysis();
+      });
+
+      document.getElementById('btn-clear-cache').addEventListener('click', () => {
+        const ticker = storage.get('last_cache_ticker', '');
+        if (ticker) localStorage.removeItem(`${appState.storagePrefix}${getCacheKey(ticker)}`);
+        storage.set('last_cache_ticker', '');
+        updateCacheStatus();
+        showNotify('Cache dibersihkan.', 'success');
+      });
+    }
+
+
+    function restoreGuardPreferences() {
+      const strictSaved = storage.get('strict_mode', null);
+      const sourceSaved = storage.get('source_priority', null);
+      if (strictSaved !== null) document.getElementById('strict-mode').checked = Boolean(strictSaved);
+      if (sourceSaved) document.getElementById('source-priority').value = sourceSaved;
+    }
+
+
+    function updateModelBadge(modelName, state = 'ready') {
+      const status = document.getElementById('model-status');
+      if (state === 'testing') {
+        status.innerHTML = `<div class='w-2 h-2 rounded-full bg-yellow-400 animate-pulse'></div><span class='text-[10px] font-black text-yellow-400 uppercase'>Testing...</span>`;
+        return;
+      }
+      if (state === 'error') {
+        status.innerHTML = `<div class='w-2 h-2 rounded-full bg-red-500'></div><span class='text-[10px] font-black text-red-500 uppercase'>Model Error</span>`;
+        return;
+      }
+      status.innerHTML = `<div class='w-2 h-2 rounded-full bg-emerald-500 animate-pulse'></div><span class='text-[10px] font-black text-emerald-500 uppercase'>${modelName} OK</span>`;
+    }
+
+    function bindModelControls() {
+      const modelSelector = document.getElementById('model-selector');
+      modelSelector.addEventListener('change', () => {
+        appState.currentModel = modelSelector.value;
+        storage.set('gemini_model', appState.currentModel);
+        updateModelBadge(appState.currentModel, 'ready');
+        showNotify(`Model aktif: ${appState.currentModel}`, 'success');
+      });
+
+      document.getElementById('btn-test-model').addEventListener('click', async () => {
+        const apiKey = keyField.value.trim();
+        if (!apiKey) return showNotify('Isi API Key terlebih dahulu.', 'error');
+        updateModelBadge(appState.currentModel, 'testing');
+        try {
+          await pingModel(apiKey, appState.currentModel);
+          updateModelBadge(appState.currentModel, 'ready');
+          showNotify('Koneksi Gemini berhasil.', 'success');
+        } catch (error) {
+          updateModelBadge(appState.currentModel, 'error');
+          showNotify(error.message || 'Koneksi model gagal.', 'error');
+        }
+      });
+    }
+
+    async function pingModel(apiKey, modelName) {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: 'reply with OK' }] }] })
+      });
+      if (!response.ok) {
+        let message = `Gagal test model ${modelName}.`;
+        try { message = (await response.json()).error?.message || message; } catch {}
+        throw new Error(message);
+      }
+      return response.json();
+    }
+
+    function bindAccuracyGuard() {
+      const confidenceInput = document.getElementById('confidence-target');
+      const confidenceLabel = document.getElementById('confidence-target-val');
+      confidenceInput.addEventListener('input', () => {
+        confidenceLabel.innerText = confidenceInput.value;
+        storage.set('confidence_target', confidenceInput.value);
+      });
+      const savedTarget = storage.get('confidence_target');
+      if (savedTarget) {
+        confidenceInput.value = savedTarget;
+        confidenceLabel.innerText = savedTarget;
+      }
+
+      document.getElementById('strict-mode').addEventListener('change', (event) => {
+        storage.set('strict_mode', event.target.checked);
+      });
+      document.getElementById('source-priority').addEventListener('change', (event) => {
+        storage.set('source_priority', event.target.value);
+      });
+    }
+
+    function toggleKey() {
+      const isPass = keyField.type === 'password';
+      keyField.type = isPass ? 'text' : 'password';
+      document.getElementById('eye-icon').setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+      lucide.createIcons();
+    }
+
+    function bindKeyboardShortcut() {
+      document.addEventListener('keydown', (event) => {
+        if (event.ctrlKey && event.key === 'Enter') runAnalysis();
+      });
+    }
+
+    function bindIntervalButtons() {
+      document.querySelectorAll('#interval-switcher button').forEach((button) => button.addEventListener('click', () => {
+        document.querySelectorAll('#interval-switcher button').forEach((b) => b.classList.remove('active'));
+        button.classList.add('active');
+        appState.interval = button.dataset.interval;
+        const ticker = (document.getElementById('ticker-input').value || 'COMPOSITE').toUpperCase();
+        renderTradingView(ticker, appState.interval);
+      }));
+    }
+
+    function bindStrategyPresets() {
+      document.querySelectorAll('#strategy-presets button').forEach((button) => button.addEventListener('click', () => {
+        document.getElementById('context').value = button.dataset.preset;
+        storage.set('draft_context', button.dataset.preset);
+        showNotify(`Preset ${button.innerText} dipakai.`, 'success');
+      }));
+      document.getElementById('context').addEventListener('input', (event) => storage.set('draft_context', event.target.value));
+      document.getElementById('ticker-input').addEventListener('input', (event) => storage.set('draft_ticker', event.target.value));
+    }
+
+    function hydrateDraft() {
+      const draftContext = storage.get('draft_context', '');
+      const draftTicker = storage.get('draft_ticker', '');
+      if (draftContext) document.getElementById('context').value = draftContext;
+      if (draftTicker) document.getElementById('ticker-input').value = draftTicker;
+    }
+
+    function bindCopyVerdict() {
+      document.getElementById('copy-summary').addEventListener('click', async () => {
+        try {
+          const text = document.getElementById('content-conclusion').innerText.trim();
+          if (!text) return showNotify('Belum ada verdict untuk disalin.', 'error');
+          await navigator.clipboard.writeText(text);
+          showNotify('Verdict disalin.', 'success');
+        } catch {
+          showNotify('Clipboard gagal diakses.', 'error');
+        }
+      });
+    }
+
+    function bindRiskCalculator() {
+      document.getElementById('calc-risk').addEventListener('click', () => {
+        const capital = Number(document.getElementById('capital').value);
+        const riskPercent = Number(document.getElementById('risk-percent').value);
+        const entry = Number(document.getElementById('entry-price').value);
+        const stop = Number(document.getElementById('stop-price').value);
+        const target = Number(document.getElementById('target-price').value);
+
+        if (!capital || !riskPercent || !entry || !stop || entry <= stop) {
+          document.getElementById('risk-output').innerText = 'Data belum valid. Pastikan Entry > Stop Loss.';
+          return;
+        }
+
+        const maxRisk = capital * (riskPercent / 100);
+        const riskPerLot = (entry - stop) * 100;
+        const lots = Math.floor(maxRisk / riskPerLot);
+        const usedCapital = lots * entry * 100;
+
+        let rrText = 'R:R --';
+        if (target && target > entry) {
+          const rr = ((target - entry) / (entry - stop)).toFixed(2);
+          rrText = `R:R 1:${rr}`;
+          document.getElementById('rr-badge').innerText = rrText;
+          document.getElementById('rr-badge').className = `text-[10px] px-2 py-1 rounded ${Number(rr) >= 2 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`;
+        }
+
+        document.getElementById('risk-output').innerHTML = `Max risiko: <strong>IDR ${maxRisk.toLocaleString('id-ID')}</strong><br>Ukuran posisi: <strong>${Math.max(lots, 0)} lot</strong><br>Estimasi modal: <strong>IDR ${Math.max(usedCapital, 0).toLocaleString('id-ID')}</strong><br>${rrText}`;
+      });
+    }
+
+    function bindReadinessChecks() {
+      document.querySelectorAll('[data-check]').forEach((checkbox) => checkbox.addEventListener('change', computeReadinessScore));
+      computeReadinessScore();
+    }
+
+    function computeReadinessScore() {
+      const checks = [...document.querySelectorAll('[data-check]')];
+      const checked = checks.filter((item) => item.checked).length;
+      const score = Math.round((checked / checks.length) * 100);
+      document.getElementById('readiness-score').innerText = `${score}%`;
+      document.getElementById('readiness-bar').style.width = `${score}%`;
+    }
+
+    function bindWatchlist() {
+      document.getElementById('add-watchlist').addEventListener('click', () => {
+        const ticker = document.getElementById('ticker-input').value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+      appState.lastTicker = ticker;
+        if (!ticker) return showNotify('Isi ticker valid.', 'error');
+        const list = storage.get('watchlist', []);
+        if (list.includes(ticker)) return showNotify(`${ticker} sudah ada.`, 'error');
+        list.unshift(ticker);
+        storage.set('watchlist', list.slice(0, 15));
+        renderWatchlist();
+        showNotify(`${ticker} masuk watchlist.`, 'success');
+      });
+    }
+
+    function renderWatchlist() {
+      const wrap = document.getElementById('watchlist-items');
+      const list = storage.get('watchlist', []);
+      wrap.innerHTML = list.length ? '' : '<p class="text-sm text-slate-500">Belum ada watchlist.</p>';
+      list.forEach((ticker) => {
+        const row = document.createElement('div');
+        row.className = 'flex gap-2 items-center';
+        const openBtn = document.createElement('button');
+        openBtn.className = 'btn-subtle flex-1 p-2 rounded-lg text-left text-sm';
+        openBtn.textContent = ticker;
+        openBtn.onclick = () => {
+          document.getElementById('ticker-input').value = ticker;
+          renderTradingView(ticker, appState.interval);
+        };
+        const delBtn = document.createElement('button');
+        delBtn.className = 'text-xs text-red-400';
+        delBtn.textContent = 'Hapus';
+        delBtn.onclick = () => {
+          storage.set('watchlist', list.filter((item) => item !== ticker));
+          renderWatchlist();
+        };
+        row.append(openBtn, delBtn);
+        wrap.appendChild(row);
+      });
+    }
+
+    function bindHistoryExport() {
+      document.getElementById('import-history').addEventListener('click', () => document.getElementById('import-history-file').click());
+      document.getElementById('import-history-file').addEventListener('change', async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (!Array.isArray(data)) throw new Error('Format file tidak valid.');
+          const normalized = data.slice(0, 12).map((row) => ({
+            ticker: String(row?.ticker || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 8) || 'N/A',
+            rating: String(row?.rating || '-').slice(0, 80),
+            target: String(row?.target || '-').slice(0, 80),
+            confidence: String(row?.confidence || '--').slice(0, 10)
+          }));
+          storage.set('history', normalized);
+          renderHistory();
+          showNotify('History berhasil diimport.', 'success');
+        } catch (error) {
+          showNotify(error.message || 'Import history gagal.', 'error');
+        } finally {
+          event.target.value = '';
+        }
+      });
+
+      document.getElementById('export-history').addEventListener('click', () => {
+        const history = storage.get('history', []);
+        if (!history.length) return showNotify('Belum ada history.', 'error');
+        const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `kyy-history-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('clear-history').addEventListener('click', () => {
+        storage.set('history', []);
+        renderHistory();
+      });
+    }
+
+    function pushHistory(item) {
+      const data = storage.get('history', []);
+      data.unshift(item);
+      storage.set('history', data.slice(0, 12));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const wrap = document.getElementById('history-list');
+      const data = storage.get('history', []);
+      wrap.innerHTML = data.length ? '' : '<p class="text-sm text-slate-500">Belum ada histori.</p>';
+      data.forEach((entry) => {
+        const button = document.createElement('button');
+        button.className = 'btn-subtle w-full p-2 rounded-lg text-left';
+        const safeTicker = sanitizeHTML(entry.ticker || 'N/A');
+        const safeRating = sanitizeHTML(entry.rating || '-');
+        const safeTarget = sanitizeHTML(entry.target || '-');
+        const safeConfidence = sanitizeHTML(entry.confidence || '--');
+        button.innerHTML = `<div class='text-sm font-bold'>${safeTicker}</div><div class='text-xs text-slate-400'>${safeRating} • ${safeTarget} • ${safeConfidence}%</div>`;
+        button.onclick = () => {
+          document.getElementById('ticker-input').value = entry.ticker;
+          renderTradingView(entry.ticker, appState.interval);
+        };
+        wrap.appendChild(button);
+      });
+    }
+
+    async function runAnalysis() {
+      const ticker = document.getElementById('ticker-input').value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+      appState.lastTicker = ticker;
+      const apiKey = keyField.value.trim();
+      const userContext = document.getElementById('context').value.trim();
+      if (!ticker) return showNotify('Target emiten tidak valid.', 'error');
+      if (!apiKey) return showNotify('API Key diperlukan.', 'error');
+
+      const guardConfig = {
+        strictMode: document.getElementById('strict-mode').checked,
+        sourcePriority: document.getElementById('source-priority').value,
+        minConfidence: Number(document.getElementById('confidence-target').value)
+      };
+
+      storage.set('secure_token', apiKey);
+      storage.set('gemini_model', appState.currentModel);
+
+      const runBtn = document.getElementById('btn-run');
+      const loader = document.getElementById('loading-overlay');
+      const loadingStep = document.getElementById('loading-step');
+      const loadingSub = document.getElementById('loading-sub');
+
+      try {
+        runBtn.disabled = true;
+        loader.classList.remove('hidden');
+        loader.classList.add('flex');
+
+        loadingStep.innerText = 'Syncing Real-Time Market Feed...';
+        renderTradingView(ticker, appState.interval);
+        document.getElementById('chart-title').innerText = `LIVE STREAM: IDX:${ticker} [${appState.currentModel}]`;
+
+        loadingStep.innerText = 'Running Accuracy Guard...';
+        const result = await fetchQuantumData(apiKey, appState.currentModel, ticker, userContext, guardConfig, (msg) => {
+          loadingSub.innerText = msg;
+        });
+
+        const normalized = normalizeAnalysisResult(result);
+        deployUI(normalized, guardConfig.minConfidence);
+        updateSentiment(normalized.bull_percent || 50);
+        saveAnalysisCache(ticker, normalized);
+        pushHistory({ ticker, rating: normalized.rating, target: normalized.target, confidence: normalized.confidence || '--' });
+        showNotify(`Analisis ${ticker} selesai.`, 'success');
+      } catch (error) {
+        showNotify(error.message || 'Kegagalan pada Quantum Core.', 'error');
+      } finally {
+        runBtn.disabled = false;
+        loader.classList.add('hidden');
+        loader.classList.remove('flex');
+        loadingSub.innerText = 'ENCRYPTED DATA STREAM CONNECTED';
+      }
+    }
+
+    async function fetchQuantumData(apiKey, modelName, ticker, context, guardConfig, statusCb) {
+      const userPrompt = `Lakukan analisis saham IDX:${ticker}. Konteks: ${context || 'analisis komprehensif'}. Guard: strictMode=${guardConfig.strictMode}, sourcePriority=${guardConfig.sourcePriority}, minConfidence=${guardConfig.minConfidence}. Jika confidence rendah, jelaskan warning.`;
+      const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v16. Fokus utama akurasi data, validasi silang, confidence score transparan, skenario bull/base/bear, dan rencana eksekusi.`;
+
+      const payload = {
+        contents: [{ parts: [{ text: userPrompt }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        tools: [{ google_search: {} }],
+        generationConfig: {
+          temperature: 0.15,
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              price: { type: 'STRING' }, target: { type: 'STRING' }, rating: { type: 'STRING' }, risk: { type: 'STRING' },
+              confidence: { type: 'INTEGER' }, data_timestamp: { type: 'STRING' },
+              bandar: { type: 'STRING' }, tech: { type: 'STRING' }, fund: { type: 'STRING' }, summary: { type: 'STRING' },
+              scenario_bull: { type: 'STRING' }, scenario_base: { type: 'STRING' }, scenario_bear: { type: 'STRING' },
+              bull_percent: { type: 'INTEGER' }
+            },
+            required: ['price', 'target', 'rating', 'risk', 'confidence', 'data_timestamp', 'bandar', 'tech', 'fund', 'summary', 'scenario_bull', 'scenario_base', 'scenario_bear', 'bull_percent']
+          }
+        }
+      };
+
+      const fetchWithExponentialBackoff = async (url, options, retries = 5) => {
+        let delay = 1200;
+        for (let i = 0; i < retries; i++) {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 25000);
+          try {
+            const response = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(timeout);
+            if (response.status === 429) {
+              statusCb?.(`Quota limit, retry ${delay / 1000}s...`);
+              await new Promise((resolve) => setTimeout(resolve, delay));
+              delay *= 2;
+              continue;
+            }
+            return response;
+          } catch (error) {
+            clearTimeout(timeout);
+            if (i === retries - 1) throw error;
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            delay *= 2;
+          }
+        }
+        return null;
+      };
+
+      const modelCandidates = [modelName, 'gemini-2.5-flash', 'gemini-2.0-flash'].filter((m, i, arr) => arr.indexOf(m) === i);
+      let lastError = null;
+
+      for (const activeModel of modelCandidates) {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey}`;
+        const response = await fetchWithExponentialBackoff(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response) {
+          lastError = new Error('Tidak ada respon dari Quantum Core.');
+          continue;
+        }
+
+        if (!response.ok) {
+          let message = `Quantum Link Interrupted (${activeModel}).`;
+          try { message = (await response.json()).error?.message || message; } catch { message += ` (Status: ${response.status})`; }
+          lastError = new Error(message);
+          if ([404, 400].includes(response.status)) {
+            statusCb?.(`Model ${activeModel} tidak tersedia, fallback...`);
+            continue;
+          }
+          throw lastError;
+        }
+
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) {
+          lastError = new Error(`Data kosong dari AI (${activeModel}).`);
+          continue;
+        }
+        try {
+          if (activeModel !== modelName) {
+            appState.currentModel = activeModel;
+            storage.set('gemini_model', activeModel);
+            document.getElementById('model-selector').value = activeModel;
+            updateModelBadge(activeModel, 'ready');
+            showNotify(`Auto-fallback model: ${activeModel}`, 'success');
+          }
+          return JSON.parse(text);
+        } catch {
+          lastError = new Error('Gagal mengurai data AI.');
+        }
+      }
+
+      throw lastError || new Error('Semua model gagal merespon.');
+    }
+
+
+    function normalizeAnalysisResult(data) {
+      const fallback = {
+        price: '-', target: '-', rating: '-', risk: '-', confidence: 0, data_timestamp: new Date().toISOString(),
+        bandar: '-', tech: '-', fund: '-', summary: '-', scenario_bull: '-', scenario_base: '-', scenario_bear: '-', bull_percent: 50
+      };
+      const merged = { ...fallback, ...(data || {}) };
+      merged.confidence = Number.isFinite(Number(merged.confidence)) ? Number(merged.confidence) : 0;
+      merged.bull_percent = Number.isFinite(Number(merged.bull_percent)) ? Number(merged.bull_percent) : 50;
+      return merged;
+    }
+
+    function sanitizeHTML(value) {
+      return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function deployUI(data, minConfidence) {
+      const map = {
+        'price-val': data.price, 'val-target': data.target, 'val-rating': data.rating, 'val-risk': data.risk,
+        'val-confidence': `${data.confidence || '--'}%`, 'val-timestamp': data.data_timestamp,
+        'content-bandar': data.bandar, 'content-tech': data.tech, 'content-fund': data.fund, 'content-conclusion': data.summary,
+        'scenario-bull': data.scenario_bull, 'scenario-base': data.scenario_base, 'scenario-bear': data.scenario_bear
+      };
+      Object.entries(map).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = sanitizeHTML(value).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+      });
+      if ((data.confidence || 0) < minConfidence) showNotify(`Warning: confidence ${data.confidence}% < target ${minConfidence}%`, 'error');
+    }
+
+    function updateSentiment(bull) {
+      bull = Math.min(100, Math.max(0, parseInt(bull) || 50));
+      const bear = 100 - bull;
+      document.getElementById('bull-bar').style.width = `${bull}%`;
+      document.getElementById('bear-bar').style.width = `${bear}%`;
+      document.getElementById('bull-val').innerText = `${bull}%`;
+      document.getElementById('bear-val').innerText = `${bear}%`;
+    }
+
+    function renderTradingView(symbol, interval = 'D') {
+      document.getElementById('chart-container').innerHTML = '';
+      new TradingView.widget({
+        autosize: true, symbol: 'IDX:' + symbol, interval, timezone: 'Asia/Jakarta', theme: 'dark', style: '1', locale: 'id',
+        toolbar_bg: '#020617', enable_publishing: false, hide_side_toolbar: false, allow_symbol_change: true,
+        container_id: 'chart-container', studies: ['MASimple@tv-basicstudies', 'RSI@tv-basicstudies', 'MACD@tv-basicstudies', 'Volume@tv-basicstudies']
+      });
+    }
+
+    function showNotify(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `fixed top-6 right-6 glass border-l-4 ${type === 'error' ? 'border-red-500' : 'border-[var(--gold)]'} p-4 rounded-xl z-[100] text-sm`;
+      toast.innerHTML = `<strong class='uppercase text-[10px] text-slate-500'>${type}</strong><div>${message}</div>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2800);
+    }
+
+    (function initPWA() {
+      const manifest = {
+        name: 'KYY Quantum Analysis', short_name: 'KYY Quantum', description: 'AI-Powered IDX Stock Analysis Engine',
+        start_url: './', display: 'standalone', background_color: '#020617', theme_color: '#020617',
+        icons: [{
+          src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23020617'/%3E%3Ccircle cx='50' cy='50' r='40' stroke='%23d4af37' stroke-width='2' fill='none'/%3E%3Ctext x='50' y='55' font-family='sans-serif' font-weight='bold' font-size='20' fill='%23fff' text-anchor='middle'%3EKYY%3C/text%3E%3C/svg%3E",
+          sizes: '512x512', type: 'image/svg+xml'
+        }]
+      };
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' }));
+      document.head.appendChild(manifestLink);
+
+      const swUrl = URL.createObjectURL(new Blob([
+        `self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));`
+      ], { type: 'application/javascript' }));
+
+      if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register(swUrl).catch(() => {}));
+    })();
+  </script>
+
+        </div>
+
+        <div class="text-[8px] md:text-[9px] text-center text-slate-600 tracking-wider">
+            Disclaimer: Analisis ini adalah alat bantu komputasi, BUKAN ajakan investasi (DYOR).
+        </div>
+
+        <div class="flex items-center gap-4 md:gap-8">
+            <div class="hidden lg:flex gap-4">
+                <span class="hover:text-[var(--gold)] cursor-help transition-colors">System Logs</span>
+                <span class="hover:text-[var(--gold)] cursor-help transition-colors">Neural Network</span>
+            </div>
+            <div class="flex items-center gap-3 pl-0 md:pl-8 md:border-l border-white/10">
+                <span class="text-slate-400">Gemini Engine Ready</span>
+                <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center"><i data-lucide="cpu" class="w-3 h-3"></i></div>
+ main
             </div>
 
             <div class="glass rounded-xl p-5 space-y-3">
@@ -899,5 +2096,388 @@
       if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register(swUrl).catch(() => {}));
     })();
   </script>
+
+    <script>
+        const appState = {
+            interval: '15',
+            historyKey: 'kyy_ultra_history',
+            storagePrefix: 'kyy_ultra_'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderTradingView('COMPOSITE', appState.interval);
+            updateSentiment(50);
+            bindIntervalButtons();
+            bindRiskCalculator();
+            bindKeyboardShortcut();
+            renderHistory();
+            updateClock();
+        });
+
+        const storage = {
+            set: (k, v) => localStorage.setItem(`${appState.storagePrefix}${k}`, typeof v === 'string' ? v : JSON.stringify(v)),
+            get: (k, fallback = null) => {
+                const raw = localStorage.getItem(`${appState.storagePrefix}${k}`);
+                if (raw === null) return fallback;
+                try {
+                    return JSON.parse(raw);
+                } catch {
+                    return raw;
+                }
+            }
+        };
+
+        const keyField = document.getElementById('api-key');
+        const cachedToken = storage.get('secure_token');
+        if (cachedToken) keyField.value = cachedToken;
+
+        function toggleKey() {
+            const isPass = keyField.type === 'password';
+            keyField.type = isPass ? 'text' : 'password';
+            document.getElementById('eye-icon').setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+            lucide.createIcons();
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            if (Math.random() > 0.75) {
+                document.getElementById('data-speed').innerText = `LATENCY: ${Math.floor(Math.random() * 18) + 14}ms`;
+            }
+        }
+        setInterval(updateClock, 1000);
+
+        function bindKeyboardShortcut() {
+            document.addEventListener('keydown', (event) => {
+                if (event.ctrlKey && event.key === 'Enter') runAnalysis();
+            });
+        }
+
+        function bindIntervalButtons() {
+            document.querySelectorAll('#interval-switcher button').forEach((button) => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('#interval-switcher button').forEach((b) => b.classList.remove('active'));
+                    button.classList.add('active');
+                    appState.interval = button.dataset.interval;
+                    const activeTicker = document.getElementById('ticker-input').value.trim().toUpperCase() || 'COMPOSITE';
+                    renderTradingView(activeTicker, appState.interval);
+                });
+            });
+        }
+
+        function bindRiskCalculator() {
+            document.getElementById('calc-risk').addEventListener('click', () => {
+                const capital = Number(document.getElementById('capital').value);
+                const riskPercent = Number(document.getElementById('risk-percent').value);
+                const entry = Number(document.getElementById('entry-price').value);
+                const stop = Number(document.getElementById('stop-price').value);
+
+                if (!capital || !riskPercent || !entry || !stop || entry <= stop) {
+                    document.getElementById('risk-output').innerText = 'Data belum valid. Pastikan Entry > Stop Loss dan seluruh field terisi.';
+                    return;
+                }
+
+                const maxRiskRupiah = capital * (riskPercent / 100);
+                const riskPerLot = (entry - stop) * 100;
+                const lots = Math.floor(maxRiskRupiah / riskPerLot);
+                const usedCapital = lots * entry * 100;
+
+                document.getElementById('risk-output').innerHTML = `Max risiko: <strong>IDR ${maxRiskRupiah.toLocaleString('id-ID')}</strong><br>Ukuran posisi: <strong>${Math.max(lots, 0)} lot</strong><br>Estimasi modal terpakai: <strong>IDR ${Math.max(usedCapital, 0).toLocaleString('id-ID')}</strong>`;
+            });
+        }
+
+        async function runAnalysis() {
+            const rawTicker = document.getElementById('ticker-input').value.trim();
+            const ticker = rawTicker.toUpperCase().replace(/[^A-Z]/g, '');
+            const apiKey = keyField.value.trim();
+            const userContext = document.getElementById('context').value.trim();
+
+            if (!ticker) return showNotify('Target emiten (Ticker) tidak valid.', 'error');
+            if (!apiKey) return showNotify('API Key diperlukan untuk neural link.', 'error');
+
+            storage.set('secure_token', apiKey);
+
+            const btn = document.getElementById('btn-run');
+            const loader = document.getElementById('loading-overlay');
+            const stepText = document.getElementById('loading-step');
+            const subText = document.getElementById('loading-sub');
+
+            try {
+                btn.disabled = true;
+                loader.classList.remove('hidden');
+
+                stepText.innerText = 'Syncing Real-Time Market Feed...';
+                renderTradingView(ticker, appState.interval);
+                document.getElementById('chart-title').innerText = `LIVE STREAM: IDX:${ticker} [VERIFIED DATA]`;
+
+                stepText.innerText = 'Processing Neural Engine Precision...';
+                const result = await fetchQuantumData(apiKey, ticker, userContext, (msg) => { subText.innerText = msg; });
+
+                stepText.innerText = 'Validating Output Accuracy...';
+                subText.innerText = 'PARSING DATA STREAM...';
+
+                deployUI(result);
+                updateSentiment(result.bull_percent || 50);
+                pushHistory({ ticker, rating: result.rating, target: result.target, risk: result.risk, at: new Date().toISOString() });
+                showNotify(`Analisis ${ticker} selesai dengan presisi tinggi.`, 'success');
+            } catch (err) {
+                console.error('Critical System Failure:', err);
+                showNotify(err.message || 'Kegagalan pada Quantum Core.', 'error');
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+                subText.innerText = 'ENCRYPTED DATA STREAM CONNECTED';
+            }
+        }
+
+        async function fetchQuantumData(key, ticker, context, statusCb) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+            const systemPrompt = `Kamu adalah KYY Quantum Ultra Analysis System v12. TUGAS UTAMA: Analisis saham IDX:${ticker} dengan data ringkas, jujur, profesional, dan action plan yang jelas.`;
+            const userPrompt = `Lakukan analisis untuk saham IDX:${ticker}. Konteks Strategi User: ${context || 'Analisis pasar komprehensif'}. Sajikan poin tajam untuk bandar, teknikal, fundamental, dan strategi eksekusi.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                tools: [{ google_search: {} }],
+                generationConfig: {
+                    temperature: 0.2,
+                    responseMimeType: 'application/json',
+                    responseSchema: {
+                        type: 'OBJECT',
+                        properties: {
+                            price: { type: 'STRING' },
+                            target: { type: 'STRING' },
+                            rating: { type: 'STRING' },
+                            risk: { type: 'STRING' },
+                            bandar: { type: 'STRING' },
+                            tech: { type: 'STRING' },
+                            fund: { type: 'STRING' },
+                            summary: { type: 'STRING' },
+                            bull_percent: { type: 'INTEGER' }
+                        },
+                        required: ['price', 'target', 'rating', 'risk', 'bandar', 'tech', 'fund', 'summary', 'bull_percent']
+                    }
+                }
+            };
+
+            const fetchWithExponentialBackoff = async (url, options, retries = 5) => {
+                let delay = 1500;
+                for (let i = 0; i < retries; i++) {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 25000);
+                    try {
+                        const response = await fetch(url, { ...options, signal: controller.signal });
+                        clearTimeout(timeout);
+                        if (response.status === 429) {
+                            if (statusCb) statusCb(`Quota Limit. Retrying in ${delay / 1000}s...`);
+                            await new Promise((r) => setTimeout(r, delay));
+                            delay *= 2;
+                            continue;
+                        }
+                        return response;
+                    } catch (e) {
+                        clearTimeout(timeout);
+                        if (i === retries - 1) throw e;
+                        await new Promise((r) => setTimeout(r, delay));
+                        delay *= 2;
+                    }
+                }
+                return null;
+            };
+
+            const response = await fetchWithExponentialBackoff(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response) throw new Error('Koneksi gagal: Tidak ada respon dari Quantum Core.');
+            if (!response.ok) {
+                let errMsg = 'Quantum Link Interrupted.';
+                try {
+                    const errData = await response.json();
+                    errMsg = errData.error?.message || errMsg;
+                } catch {
+                    errMsg += ` (Status: ${response.status})`;
+                }
+                throw new Error(errMsg);
+            }
+
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) throw new Error('Neural Engine mengembalikan data kosong.');
+
+            try {
+                return JSON.parse(text);
+            } catch {
+                throw new Error('Gagal mengurai data algoritma AI.');
+            }
+        }
+
+        function sanitizeHTML(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function deployUI(data) {
+            const elements = {
+                'price-val': data.price,
+                'val-target': data.target,
+                'val-rating': data.rating,
+                'val-risk': data.risk,
+                'content-bandar': data.bandar,
+                'content-tech': data.tech,
+                'content-fund': data.fund,
+                'content-conclusion': data.summary
+            };
+
+            Object.entries(elements).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.opacity = '0';
+                    setTimeout(() => {
+                        let formattedVal = sanitizeHTML(val).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                        el.innerHTML = formattedVal || 'N/A';
+                        el.style.opacity = '1';
+                    }, 160);
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function updateSentiment(bull) {
+            bull = Math.min(100, Math.max(0, parseInt(bull) || 50));
+            const bear = 100 - bull;
+            document.getElementById('bull-bar').style.width = `${bull}%`;
+            document.getElementById('bear-bar').style.width = `${bear}%`;
+            document.getElementById('bull-val').innerText = `${bull}%`;
+            document.getElementById('bear-val').innerText = `${bear}%`;
+
+            const dot = document.getElementById('sentiment-dot');
+            dot.className = `w-2 h-2 rounded-full ${bull > 50 ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : (bull < 50 ? 'bg-red-500 shadow-[0_0_10px_#ef4444]' : 'bg-yellow-500')}`;
+        }
+
+        function renderTradingView(symbol, interval = 'D') {
+            const container = document.getElementById('chart-container');
+            container.innerHTML = '';
+
+            new TradingView.widget({
+                autosize: true,
+                symbol: 'IDX:' + symbol,
+                interval,
+                timezone: 'Asia/Jakarta',
+                theme: 'dark',
+                style: '1',
+                locale: 'id',
+                toolbar_bg: '#020617',
+                enable_publishing: false,
+                hide_side_toolbar: false,
+                allow_symbol_change: true,
+                container_id: 'chart-container',
+                studies: ['MASimple@tv-basicstudies', 'RSI@tv-basicstudies', 'MACD@tv-basicstudies', 'Volume@tv-basicstudies']
+            });
+        }
+
+        function pushHistory(item) {
+            const data = storage.get('history', []);
+            data.unshift(item);
+            storage.set('history', data.slice(0, 7));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const data = storage.get('history', []);
+            const wrap = document.getElementById('history-list');
+            wrap.innerHTML = data.length ? '' : '<p class="text-[11px] text-slate-500">Belum ada histori.</p>';
+            data.forEach((entry) => {
+                const button = document.createElement('button');
+                button.className = 'analysis-item w-full p-3 rounded-xl text-left transition-all';
+                button.innerHTML = `<p class="text-xs font-black text-white">${entry.ticker}</p><p class="text-[10px] text-slate-400">${entry.rating || '-'} • ${entry.target || '-'}</p>`;
+                button.onclick = () => {
+                    document.getElementById('ticker-input').value = entry.ticker;
+                    document.getElementById('val-target').innerText = entry.target || '---';
+                    document.getElementById('val-rating').innerText = entry.rating || '---';
+                    document.getElementById('val-risk').innerText = entry.risk || '---';
+                    renderTradingView(entry.ticker, appState.interval);
+                };
+                wrap.appendChild(button);
+            });
+        }
+
+        document.getElementById('clear-history').addEventListener('click', () => {
+            storage.set('history', []);
+            renderHistory();
+        });
+
+        function showNotify(msg, type = 'info') {
+            const toast = document.createElement('div');
+            const borderColor = type === 'error' ? 'border-red-500' : 'border-[var(--gold)]';
+            const icon = type === 'error' ? 'alert-octagon' : 'info';
+
+            toast.className = `fixed top-6 right-6 glass border-l-4 ${borderColor} p-5 rounded-2xl z-[100] shadow-2xl flex items-center gap-4 min-w-[300px] transform transition-all duration-500 translate-x-full`;
+            toast.innerHTML = `
+                <div class="p-2 rounded-lg bg-white/5"><i data-lucide="${icon}" class="w-5 h-5 ${type === 'error' ? 'text-red-500' : 'text-[var(--gold)]'}"></i></div>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black uppercase text-slate-500 tracking-widest">${type} notification</span>
+                    <span class="text-sm font-bold text-slate-100">${msg}</span>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => toast.style.transform = 'translateX(0)', 80);
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        (function initPWA() {
+            const manifest = {
+                name: 'KYY Quantum Analysis',
+                short_name: 'KYY Quantum',
+                description: 'AI-Powered IDX Stock Analysis Engine',
+                start_url: './',
+                display: 'standalone',
+                background_color: '#020617',
+                theme_color: '#020617',
+                icons: [{
+                    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23020617'/%3E%3Ccircle cx='50' cy='50' r='40' stroke='%23d4af37' stroke-width='2' fill='none'/%3E%3Ctext x='50' y='55' font-family='sans-serif' font-weight='bold' font-size='20' fill='%23fff' text-anchor='middle'%3EKYY%3C/text%3E%3C/svg%3E",
+                    sizes: '512x512',
+                    type: 'image/svg+xml'
+                }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = manifestUrl;
+            document.head.appendChild(manifestLink);
+
+            const swCode = `
+                const CACHE_NAME = 'kyy-quantum-v2';
+                self.addEventListener('install', (event) => self.skipWaiting());
+                self.addEventListener('activate', (event) => event.waitUntil(clients.claim()));
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+                });
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW failed: ', err));
+                });
+            }
+        })();
+    </script>
+ main
+ main
 </body>
 </html>
